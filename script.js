@@ -1036,14 +1036,16 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const bioTransmission = 
 `DEVELOPER PROFILE SUMMARY:
-I am a highly motivated B.Tech student in Computer Engineering at SVKM's NMIMS Shirpur.
-Specializing in building AI/ML applications, full-stack systems, and cybersecurity solutions.
-Frequently lead technical teams in hackathons, turning complex problems into functional, high-performance software.
+I am a highly motivated B.Tech Computer Engineering student at SVKM's NMIMS Shirpur. As an AI & Full-Stack Web Developer, I specialize in engineering scalable AI/ML pipelines, real-time web applications, and robust cybersecurity solutions. 
 
-PORTFOLIO HIGHLIGHTS:
-- Approach: Modular clean code, security-first development, agile prototyping.
-- Core Specialties: Python, JavaScript, React.js, Flask, Django, TF Lite, Scikit-learn.
-- Current Status: Batch Topper (GPA: 9.41 / Overall CGPA: 8.54)`;
+TECHNICAL LEADERSHIP & ACADEMICS:
+- Hackathon Team Lead: Commanded multi-disciplined squads of 2 to 5 members, translating abstract challenges into optimal, high-performance software and securing a Top 3 Finish in Inter-College Hackathons.
+- Academic Performance: Batch Topper in B.Tech CE (3rd Sem) with a 9.41 GPA and an overall CGPA of 8.54/10. Certified in Data Structures & Algorithms by NPTEL with an optimal algorithmic proficiency rating.
+
+PORTFOLIO HIGHLIGHTS & ARCHITECTURE:
+- Engineering Approach: Strict modular clean code patterns, security-first database controls, and agile prototyping methodologies.
+- Core Specializations: Python, JavaScript, React.js, Angular, Node.js, Express, Flask, Django, TF Lite, and Scikit-learn.
+- Data & Operations: MongoDB, Firebase Firestore, relational DBMS/SQL, Git/GitHub version control, Vercel, and Render Cloud deployments.`;
 
     let hudController = null;
     let terminalInstance = null;
