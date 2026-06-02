@@ -813,6 +813,10 @@ class HudController {
         const el = document.getElementById(elementId);
         if (!el) return;
         
+        if (el.typewriterTimeout) {
+            clearTimeout(el.typewriterTimeout);
+        }
+        
         el.textContent = '';
         let index = 0;
         
@@ -820,10 +824,12 @@ class HudController {
             if (index < text.length) {
                 el.textContent += text.charAt(index);
                 index++;
-                if (index % 3 === 0) {
+                if (index % 3 === 0 && this.soundSynth) {
                     this.soundSynth.playHover();
                 }
-                setTimeout(type, speed);
+                el.typewriterTimeout = setTimeout(type, speed);
+            } else {
+                el.typewriterTimeout = null;
             }
         };
         

@@ -222,6 +222,10 @@ export class HudController {
         const el = document.getElementById(elementId);
         if (!el) return;
         
+        if (el.typewriterTimeout) {
+            clearTimeout(el.typewriterTimeout);
+        }
+        
         el.textContent = '';
         let index = 0;
         
@@ -231,11 +235,13 @@ export class HudController {
                 index++;
                 
                 // Play tiny typing sound every few characters to sound cool but quiet
-                if (index % 3 === 0) {
+                if (index % 3 === 0 && this.soundSynth) {
                     this.soundSynth.playHover();
                 }
                 
-                setTimeout(type, speed);
+                el.typewriterTimeout = setTimeout(type, speed);
+            } else {
+                el.typewriterTimeout = null;
             }
         };
         
