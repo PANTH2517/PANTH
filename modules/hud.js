@@ -23,7 +23,7 @@ export class HudController {
                 ]
             },
             'cloud-security': {
-                title: 'CLOUD SECURITY SECURITY SYSTEM',
+                title: 'CLOUD LOGIN ANOMALY DETECTION',
                 score: 89,
                 threads: '4 CORE ENGINES',
                 impact: 'MEDIUM PRIORITY [ACCESS CONTROL]',
@@ -50,7 +50,7 @@ export class HudController {
                 ]
             },
             'recommender': {
-                title: 'SEMANTIC RECOMMENDER STATUS',
+                title: 'MOVIE RECOMMENDATION SYSTEM',
                 score: 91,
                 threads: '16 THREADS',
                 impact: 'UTILITY [SEARCH]',

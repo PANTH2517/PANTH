@@ -627,7 +627,7 @@ class HudController {
                 ]
             },
             'cloud-security': {
-                title: 'CLOUD LOGIN ANOMALY DETECTOR',
+                title: 'CLOUD LOGIN ANOMALY DETECTION',
                 score: 89,
                 threads: '4 CORE ENGINES',
                 impact: 'MEDIUM PRIORITY [ACCESS CONTROL]',
@@ -654,7 +654,7 @@ class HudController {
                 ]
             },
             'recommender': {
-                title: 'RECOMMENDER SYSTEM STATUS REPORT',
+                title: 'MOVIE RECOMMENDATION SYSTEM',
                 score: 91,
                 threads: '16 THREADS',
                 impact: 'UTILITY [SEARCH]',
