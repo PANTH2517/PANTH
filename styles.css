@@ -1906,3 +1906,355 @@ body {
     padding: 10px 0;
     white-space: nowrap;
 }
+
+/* ==========================================================================
+   RESPONSIVE MEDIA QUERIES — MOBILE & TABLET
+   ========================================================================== */
+
+/* ---- Tablet (max 1024px) ---- */
+@media (max-width: 1024px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto;
+    }
+
+    .panel-hero {
+        grid-column: 1 / 2;
+    }
+
+    .panel-console {
+        grid-column: 1 / 3;
+        grid-row: 2;
+    }
+
+    .panel-quicklinks {
+        grid-column: 2 / 3;
+        grid-row: 1;
+    }
+
+    .dossier-layout {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto;
+    }
+
+    .projects-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .achievements-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .contact-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .hud-nav {
+        gap: 2px;
+    }
+
+    .nav-btn {
+        min-width: 80px;
+        padding: 10px 10px 12px 10px;
+    }
+
+    .nav-text {
+        font-size: 0.68rem;
+    }
+}
+
+/* ---- Mobile (max 768px) ---- */
+@media (max-width: 768px) {
+
+    /* Body and container */
+    body {
+        height: auto;
+        min-height: 100vh;
+        align-items: flex-start;
+    }
+
+    .hud-container {
+        height: auto;
+        min-height: 100vh;
+        overflow-y: auto;
+    }
+
+    /* Header — stack into two rows */
+    .hud-header {
+        height: auto;
+        flex-wrap: wrap;
+        padding: 8px 12px;
+        gap: 8px;
+    }
+
+    .header-left {
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .telemetry-badge {
+        padding: 4px 8px;
+    }
+
+    .telemetry-label {
+        font-size: 0.65rem;
+    }
+
+    .system-status {
+        font-size: 0.7rem;
+    }
+
+    /* Nav — scrollable horizontal row */
+    .hud-nav {
+        width: 100%;
+        order: 3;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        gap: 0;
+        height: 44px;
+        align-items: stretch;
+        border-top: 1px solid rgba(255,255,255,0.06);
+        padding-top: 4px;
+    }
+
+    .hud-nav::-webkit-scrollbar { display: none; }
+
+    .nav-btn {
+        min-width: 90px;
+        flex-shrink: 0;
+        padding: 6px 10px 8px 10px;
+        border-bottom-width: 2px;
+    }
+
+    .nav-text {
+        font-size: 0.6rem;
+        letter-spacing: 0.03em;
+        white-space: nowrap;
+    }
+
+    .header-right {
+        gap: 8px;
+    }
+
+    .ship-clock .value {
+        font-size: 0.8rem;
+    }
+
+    /* Viewport padding */
+    .hud-viewport {
+        padding: 12px;
+        overflow-y: visible;
+    }
+
+    .hud-view {
+        height: auto;
+    }
+
+    /* OVERVIEW — single column stack */
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+        gap: 12px;
+        height: auto;
+    }
+
+    .panel-hero,
+    .panel-console,
+    .panel-quicklinks {
+        grid-column: 1 / 2;
+        grid-row: auto;
+    }
+
+    /* Reduce avatar size */
+    .avatar-container {
+        width: 100px;
+        height: 100px;
+    }
+
+    .captain-name {
+        font-size: 1rem;
+    }
+
+    /* Biography stats — 1 column on tiny screens */
+    .system-stats-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    /* System monitor — hide on mobile to save space */
+    .system-monitor {
+        display: none;
+    }
+
+    /* BIO & SKILLS — single column */
+    .dossier-layout {
+        grid-template-columns: 1fr;
+        height: auto;
+        gap: 12px;
+    }
+
+    /* PROJECTS — single column */
+    .projects-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .projects-layout {
+        height: auto;
+    }
+
+    .projects-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .project-filters {
+        width: 100%;
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .filter-btn {
+        flex: 1;
+        text-align: center;
+        font-size: 0.65rem;
+        padding: 8px 4px;
+    }
+
+    /* Project card buttons */
+    .project-btn-group {
+        gap: 6px;
+    }
+
+    /* ACHIEVEMENTS — single column */
+    .achievements-layout {
+        grid-template-columns: 1fr;
+        height: auto;
+        gap: 12px;
+    }
+
+    .panel-milestones {
+        width: 100%;
+    }
+
+    /* CONTACT — single column */
+    .contact-layout {
+        grid-template-columns: 1fr;
+        height: auto;
+        gap: 12px;
+    }
+
+    /* Contact form */
+    .form-row {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    /* Hide radar on mobile */
+    .signal-radar-visual {
+        display: none;
+    }
+
+    /* TERMINAL */
+    .terminal-wrapper {
+        height: auto;
+        min-height: 400px;
+    }
+
+    /* Diagnostics modal */
+    .diagnostic-modal-panel {
+        width: 95vw;
+        max-height: 85vh;
+        overflow-y: auto;
+    }
+
+    .modal-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* Footer */
+    .hud-footer {
+        flex-direction: column;
+        text-align: center;
+        gap: 6px;
+        padding: 10px 12px;
+        font-size: 0.65rem;
+    }
+
+    /* Boot screen */
+    .boot-loader {
+        width: 90vw;
+        padding: 30px 20px;
+    }
+
+    /* HackerRank badges */
+    .hr-badges-container {
+        justify-content: center;
+    }
+}
+
+/* ---- Small Mobile (max 480px) ---- */
+@media (max-width: 480px) {
+    .hud-header {
+        padding: 6px 10px;
+    }
+
+    .nav-btn {
+        min-width: 75px;
+        padding: 5px 8px 7px 8px;
+    }
+
+    .nav-text {
+        font-size: 0.55rem;
+    }
+
+    .panel-header h3 {
+        font-size: 0.7rem;
+    }
+
+    .captain-name {
+        font-size: 0.9rem;
+    }
+
+    .hud-btn .btn-text {
+        font-size: 0.65rem;
+    }
+
+    .hud-viewport {
+        padding: 8px;
+    }
+
+    .panel-body {
+        padding: 10px;
+    }
+
+    .log-output-container {
+        font-size: 0.78rem;
+        padding: 12px;
+        min-height: 150px;
+    }
+
+    .typewriter-text {
+        font-size: 0.75rem;
+        line-height: 1.5;
+    }
+
+    .project-card .ach-title {
+        font-size: 0.8rem;
+    }
+
+    .achievement-card {
+        padding: 12px;
+        gap: 10px;
+    }
+
+    .achievement-badge {
+        width: 38px;
+        height: 38px;
+        font-size: 1.2rem;
+    }
+}
