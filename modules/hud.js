@@ -63,29 +63,29 @@ export class HudController {
                 ]
             },
             'plant-disease': {
-                title: 'PLANT DISEASE DETECTOR STATUS',
+                title: 'ECOROUTE DIAGNOSTICS REPORT',
                 score: 92,
                 threads: '12 COMPUTE UNIT CORES',
-                impact: 'MEDIUM PRIORITY [AGRICULTURE]',
+                impact: 'MEDIUM PRIORITY [GREEN NAVIGATION]',
                 logs: [
-                    'SYSTEM: Initializing convolutional neural networks...',
-                    'MODEL WEIGHTS: Loaded (Custom CNN Architecture in TensorFlow)',
-                    'IMAGE PRE-PROCESSING: Normalizing pixel tensors...',
-                    'CLASSIFICATION: Scoring crop leaf health categories...',
-                    'DIAGNOSTIC RESOLUTION: 96.7% disease classification accuracy. Deployed portable web interface for remote usage.',
+                    'SYSTEM: Powering up greenest pathway optimization matrix...',
+                    'MAP LAYERS: Fetching carbon footprint index feeds...',
+                    'ROUTING ENGINE: Calculating eco-friendly paths via Leaflet...',
+                    'UI SHELL: Initializing React-based map container overlays...',
+                    'DIAGNOSTIC RESOLUTION: 100% path resolution rendering completed. Successfully calculated minimal carbon paths.',
                 ]
             },
             'urban-orbit': {
-                title: 'URBAN ORBIT DEPLOYMENT LOGS',
+                title: 'ROOMFIX COMPLAINT DATABASE LOGS',
                 score: 95,
-                threads: 'SECURE FIREBASE HOOKS',
-                impact: 'CRITICAL PRIORITY [MUNICIPAL INTEGRITY]',
+                threads: 'SECURE DBMS RULES',
+                impact: 'HIGH PRIORITY [HOSTEL MANAGEMENT]',
                 logs: [
-                    'SYSTEM: Initiating Firebase Authentication & Firestore services...',
-                    'CITIZEN PORTAL: Mapping client geolocation coordinates...',
-                    'GOVERNMENT NODE: Activating administration coordinator console...',
-                    'DATABASE SECURITY: Enforcing firestore row-level rules...',
-                    'DIAGNOSTIC RESOLUTION: Real-time municipal coordination portal online. Resolved database authorization bottlenecks.',
+                    'SYSTEM: Initiating RoomFix complaint dashboard queries...',
+                    'DATABASE NODE: Connecting hostel maintenance tables...',
+                    'RESOLVER ENGINE: Assigning room repair priority queues...',
+                    'UI SHELL: Loading Angular web interface templates...',
+                    'DIAGNOSTIC RESOLUTION: RoomFix hostel DBMS platform online. Bypassed database connection bottlenecks.',
                 ]
             },
             'space-scope': {

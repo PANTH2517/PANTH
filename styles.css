@@ -1887,3 +1887,23 @@ body {
     border-color: rgba(0, 240, 255, 0.6);
     box-shadow: 0 0 25px rgba(0, 240, 255, 0.25);
 }
+
+/* Two-Button Group for Projects */
+.project-btn-group {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+}
+
+.project-btn-group .btn-diagnose {
+    flex: 1;
+}
+
+.project-btn-group .btn-launch {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    padding: 10px 15px;
+    white-space: nowrap;
+}
