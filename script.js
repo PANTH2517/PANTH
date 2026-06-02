@@ -985,7 +985,6 @@ class HudController {
             })
             .then(response => response.json())
             .then(data => {
-                console.log("FormSubmit direct response:", data);
                 btnText.textContent = 'SIGNAL SENT';
                 this.soundSynth.playClick();
                 
