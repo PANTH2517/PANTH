@@ -1814,3 +1814,76 @@ body {
         grid-template-columns: 1fr;
     }
 }
+
+/* ==========================================
+ * GitHub Subspace Telemetry Styling
+ * ========================================== */
+.profile-views-counter {
+    display: inline-flex;
+    margin-top: 8px;
+    border: 1px solid rgba(0, 240, 255, 0.2);
+    padding: 2px;
+    border-radius: 4px;
+    background: rgba(0, 240, 255, 0.05);
+}
+.profile-views-counter img {
+    height: 20px;
+}
+.github-stats-layout {
+    width: 100%;
+}
+.github-cards-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+    align-items: stretch;
+}
+.github-img-card {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 240, 255, 0.1);
+    box-shadow: 0 0 10px rgba(0, 240, 255, 0.05);
+    background: rgba(10, 10, 25, 0.4);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.github-img-card:hover {
+    border-color: rgba(0, 240, 255, 0.4);
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
+    transform: translateY(-2px);
+}
+.github-stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 15px;
+}
+@media (max-width: 900px) {
+    .github-stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
+.panel-github-analytics { border-color: rgba(0, 240, 255, 0.1); }
+.panel-github-analytics::before { border-color: var(--cyan); }
+
+.panel-github-details { border-color: rgba(157, 0, 255, 0.1); }
+.panel-github-details::before { border-color: var(--purple); }
+
+.panel-github-languages { border-color: rgba(255, 0, 127, 0.1); }
+.panel-github-languages::before { border-color: var(--pink); }
+
+.github-snake-panel { border-color: rgba(0, 240, 255, 0.1); }
+.github-snake-panel::before { border-color: var(--cyan); }
+.github-snake-img {
+    max-width: 100%;
+    border-radius: 4px;
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.1);
+    background: #1a1b27;
+    padding: 12px;
+    border: 1px solid rgba(0, 240, 255, 0.25);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.github-snake-img:hover {
+    border-color: rgba(0, 240, 255, 0.6);
+    box-shadow: 0 0 25px rgba(0, 240, 255, 0.25);
+}
