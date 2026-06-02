@@ -193,6 +193,22 @@ body {
     position: relative;
 }
 
+.boot-logo {
+    width: 90px;
+    height: 90px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto 20px auto;
+    border-radius: 50%;
+    filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.7)) drop-shadow(0 0 24px rgba(157, 0, 255, 0.4));
+    animation: bootLogoPulse 2.5s ease-in-out infinite;
+}
+
+@keyframes bootLogoPulse {
+    0%, 100% { filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.6)) drop-shadow(0 0 20px rgba(157, 0, 255, 0.3)); transform: scale(1); }
+    50%       { filter: drop-shadow(0 0 18px rgba(0, 240, 255, 1))   drop-shadow(0 0 36px rgba(157, 0, 255, 0.7)); transform: scale(1.05); }
+}
+
 .boot-title {
     font-family: 'Orbitron', sans-serif;
     color: var(--cyan);
