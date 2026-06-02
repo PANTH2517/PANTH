@@ -193,20 +193,61 @@ body {
     position: relative;
 }
 
-.boot-logo {
-    width: 130px;
-    height: 130px;
-    object-fit: contain;
-    display: block;
-    margin: 0 auto 20px auto;
+/* Boot logo wrapper — glowing rings animate here, not on the logo */
+.boot-logo-wrapper {
+    width: 165px;
+    height: 165px;
+    margin: 0 auto 24px auto;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     border-radius: 50%;
-    filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.7)) drop-shadow(0 0 24px rgba(157, 0, 255, 0.4));
-    animation: bootLogoPulse 2.5s ease-in-out infinite;
+    animation: bootGlowPulse 2.5s ease-in-out infinite;
 }
 
-@keyframes bootLogoPulse {
-    0%, 100% { filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.6)) drop-shadow(0 0 20px rgba(157, 0, 255, 0.3)); transform: scale(1); }
-    50%       { filter: drop-shadow(0 0 18px rgba(0, 240, 255, 1))   drop-shadow(0 0 36px rgba(157, 0, 255, 0.7)); transform: scale(1.05); }
+/* Inner cyan ring */
+.boot-logo-wrapper::before {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 2px solid rgba(0, 240, 255, 0.6);
+    animation: bootRingPulse 2.5s ease-in-out infinite;
+    pointer-events: none;
+}
+
+/* Outer purple ring */
+.boot-logo-wrapper::after {
+    content: '';
+    position: absolute;
+    inset: -14px;
+    border-radius: 50%;
+    border: 1px solid rgba(157, 0, 255, 0.4);
+    animation: bootRingPulse 2.5s ease-in-out infinite 0.6s;
+    pointer-events: none;
+}
+
+/* Logo image — completely stable, no animation */
+.boot-logo {
+    width: 165px;
+    height: 165px;
+    object-fit: contain;
+    display: block;
+    border-radius: 50%;
+    filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.45));
+    position: relative;
+    z-index: 2;
+}
+
+@keyframes bootGlowPulse {
+    0%, 100% { box-shadow: 0 0 18px rgba(0, 240, 255, 0.35), 0 0 40px rgba(157, 0, 255, 0.15); }
+    50%       { box-shadow: 0 0 35px rgba(0, 240, 255, 0.75), 0 0 70px rgba(157, 0, 255, 0.45); }
+}
+
+@keyframes bootRingPulse {
+    0%, 100% { opacity: 0.35; transform: scale(1); }
+    50%       { opacity: 1;    transform: scale(1.06); }
 }
 
 .boot-title {
