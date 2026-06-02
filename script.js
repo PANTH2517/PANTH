@@ -1112,6 +1112,9 @@ PORTFOLIO HIGHLIGHTS & ARCHITECTURE:
             
             hudController = new HudController(soundSynth);
             
+            // Mask the avatar photo immediately upon dashboard entry
+            setTimeout(updateScanlineMask, 100);
+            
             setTimeout(() => {
                 if (hudController) {
                     hudController.triggerTypewriter('hero-typewriter', bioTransmission, 15);
@@ -1150,6 +1153,27 @@ PORTFOLIO HIGHLIGHTS & ARCHITECTURE:
         });
     }
     
+    const updateScanlineMask = () => {
+        const scanlines = document.querySelector('.hud-scanlines');
+        if (!scanlines) return;
+        
+        const avatar = document.querySelector('.avatar-container');
+        if (avatar && avatar.offsetParent !== null) {
+            const rect = avatar.getBoundingClientRect();
+            const x = rect.left + rect.width / 2;
+            const y = rect.top + rect.height / 2;
+            const r = rect.width / 2 + 1; // 1px margin to prevent grid borders from showing
+            const mask = `radial-gradient(circle at ${x}px ${y}px, transparent ${r}px, black ${r}px)`;
+            scanlines.style.maskImage = mask;
+            scanlines.style.webkitMaskImage = mask;
+        } else {
+            scanlines.style.maskImage = 'none';
+            scanlines.style.webkitMaskImage = 'none';
+        }
+    };
+
+    window.addEventListener('resize', updateScanlineMask);
+
     const navButtons = document.querySelectorAll('.nav-btn');
     const views = document.querySelectorAll('.hud-view');
     
@@ -1168,6 +1192,9 @@ PORTFOLIO HIGHLIGHTS & ARCHITECTURE:
             const targetView = document.getElementById(`view-${targetId}`);
             if (targetView) {
                 targetView.classList.add('active');
+                
+                // Dynamically update the mask on tab change
+                setTimeout(updateScanlineMask, 50);
                 
                 if (targetId === 'home') {
                     if (hudController) {
