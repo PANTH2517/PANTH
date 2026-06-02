@@ -526,6 +526,18 @@ class InteractiveTerminal {
         this.writeLine('4. RECOMMENDER CORE: Semantic Recommendation Engine (Mar 2025)', 'text-blue');
         this.writeLine('   - Objective: Solve descriptions matches with movie databases.');
         this.writeLine('   - Tech: Python, TF-IDF Vectorization, Cosine Similarity, Streamlit.');
+        this.writeLine('');
+        this.writeLine('5. PLANT DISEASE DETECTION: Crop Health Identification System (Mar 2025)', 'text-green');
+        this.writeLine('   - Objective: Identify crop leaf diseases to assist farming operations.');
+        this.writeLine('   - Tech: Python, TensorFlow CNN models, Image Processing.');
+        this.writeLine('');
+        this.writeLine('6. URBAN ORBIT: Citizen Reporting & Government Dashboard (Apr 2026)', 'text-cyan');
+        this.writeLine('   - Objective: Connect citizens with municipal systems to report and coordinate issues.');
+        this.writeLine('   - Tech: React, Vite, Firebase Auth/Firestore, Tailwind CSS.');
+        this.writeLine('');
+        this.writeLine('7. SPACE SCOPE: Astronomy Catalog Telemetry Interface (May 2026)', 'text-purple');
+        this.writeLine('   - Objective: Render planetary catalogs and track cosmic satellite paths.');
+        this.writeLine('   - Tech: MERN Stack (Node, Express, React, MongoDB), Google Auth.');
         this.writeLine('----------------------------------------------------', 'text-muted');
     }
     
@@ -652,6 +664,45 @@ class HudController {
                     'CORRELATION: Cosine similarity indices computed',
                     'RESOLVER: Streamlit web console online',
                     'PROJECT OUTCOME: Semantic recommendation complete. Successfully bypassed cold-start index blockages.',
+                ]
+            },
+            'plant-disease': {
+                title: 'PLANT DISEASE DETECTOR STATUS',
+                score: 92,
+                threads: '12 COMPUTE UNIT CORES',
+                impact: 'MEDIUM PRIORITY [AGRICULTURE]',
+                logs: [
+                    'SYSTEM: Initializing convolutional neural networks...',
+                    'MODEL WEIGHTS: Loaded (Custom CNN Architecture in TensorFlow)',
+                    'IMAGE PRE-PROCESSING: Normalizing pixel tensors...',
+                    'CLASSIFICATION: Scoring crop leaf health categories...',
+                    'PROJECT OUTCOME: 96.7% disease classification accuracy. Deployed portable web interface for remote usage.',
+                ]
+            },
+            'urban-orbit': {
+                title: 'URBAN ORBIT DEPLOYMENT LOGS',
+                score: 95,
+                threads: 'SECURE FIREBASE HOOKS',
+                impact: 'CRITICAL PRIORITY [MUNICIPAL INTEGRITY]',
+                logs: [
+                    'SYSTEM: Initiating Firebase Authentication & Firestore services...',
+                    'CITIZEN PORTAL: Mapping client geolocation coordinates...',
+                    'GOVERNMENT NODE: Activating administration coordinator console...',
+                    'DATABASE SECURITY: Enforcing firestore row-level rules...',
+                    'PROJECT OUTCOME: Real-time municipal coordination portal online. Resolved database authorization bottlenecks.',
+                ]
+            },
+            'space-scope': {
+                title: 'SPACE SCOPE TELEMETRY LOGS',
+                score: 93,
+                threads: 'MERN STACK DATA PIPELINE',
+                impact: 'HIGH PRIORITY [CELESTIAL OBS]',
+                logs: [
+                    'SYSTEM: Initiating astronomical data feeds...',
+                    'FRONTEND: Vite SPA production build completed...',
+                    'BACKEND: Express API server active on Render cloud...',
+                    'OAUTH HANDLER: Authenticating credentials via Google Auth...',
+                    'PROJECT OUTCOME: Completed planetary catalog indexing and satellite path visuals.',
                 ]
             }
         };

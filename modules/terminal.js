@@ -144,6 +144,18 @@ export class InteractiveTerminal {
         this.writeLine('4. RECOMMENDER CORE: Semantic Recommendation Engine (Mar 2025)', 'text-blue');
         this.writeLine('   - Objective: Solve descriptions matches with movie databases.');
         this.writeLine('   - Tech: Python, TF-IDF Vectorization, Cosine Similarity, Streamlit.');
+        this.writeLine('');
+        this.writeLine('5. PLANT DISEASE DETECTION: Crop Health Identification System (Mar 2025)', 'text-green');
+        this.writeLine('   - Objective: Identify crop leaf diseases to assist farming operations.');
+        this.writeLine('   - Tech: Python, TensorFlow CNN models, Image Processing.');
+        this.writeLine('');
+        this.writeLine('6. URBAN ORBIT: Citizen Reporting & Government Dashboard (Apr 2026)', 'text-cyan');
+        this.writeLine('   - Objective: Connect citizens with municipal systems to report and coordinate issues.');
+        this.writeLine('   - Tech: React, Vite, Firebase Auth/Firestore, Tailwind CSS.');
+        this.writeLine('');
+        this.writeLine('7. SPACE SCOPE: Astronomy Catalog Telemetry Interface (May 2026)', 'text-purple');
+        this.writeLine('   - Objective: Render planetary catalogs and track cosmic satellite paths.');
+        this.writeLine('   - Tech: MERN Stack (Node, Express, React, MongoDB), Google Auth.');
         this.writeLine('----------------------------------------------------', 'text-muted');
     }
     

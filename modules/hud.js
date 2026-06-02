@@ -61,6 +61,45 @@ export class HudController {
                     'RESOLVER: Streamlit web console online',
                     'DIAGNOSTIC RESOLUTION: Semantic recommendation complete. Successfully bypassed cold-start index blockages.',
                 ]
+            },
+            'plant-disease': {
+                title: 'PLANT DISEASE DETECTOR STATUS',
+                score: 92,
+                threads: '12 COMPUTE UNIT CORES',
+                impact: 'MEDIUM PRIORITY [AGRICULTURE]',
+                logs: [
+                    'SYSTEM: Initializing convolutional neural networks...',
+                    'MODEL WEIGHTS: Loaded (Custom CNN Architecture in TensorFlow)',
+                    'IMAGE PRE-PROCESSING: Normalizing pixel tensors...',
+                    'CLASSIFICATION: Scoring crop leaf health categories...',
+                    'DIAGNOSTIC RESOLUTION: 96.7% disease classification accuracy. Deployed portable web interface for remote usage.',
+                ]
+            },
+            'urban-orbit': {
+                title: 'URBAN ORBIT DEPLOYMENT LOGS',
+                score: 95,
+                threads: 'SECURE FIREBASE HOOKS',
+                impact: 'CRITICAL PRIORITY [MUNICIPAL INTEGRITY]',
+                logs: [
+                    'SYSTEM: Initiating Firebase Authentication & Firestore services...',
+                    'CITIZEN PORTAL: Mapping client geolocation coordinates...',
+                    'GOVERNMENT NODE: Activating administration coordinator console...',
+                    'DATABASE SECURITY: Enforcing firestore row-level rules...',
+                    'DIAGNOSTIC RESOLUTION: Real-time municipal coordination portal online. Resolved database authorization bottlenecks.',
+                ]
+            },
+            'space-scope': {
+                title: 'SPACE SCOPE TELEMETRY LOGS',
+                score: 93,
+                threads: 'MERN STACK DATA PIPELINE',
+                impact: 'HIGH PRIORITY [CELESTIAL OBS]',
+                logs: [
+                    'SYSTEM: Initiating astronomical data feeds...',
+                    'FRONTEND: Vite SPA production build completed...',
+                    'BACKEND: Express API server active on Render cloud...',
+                    'OAUTH HANDLER: Authenticating credentials via Google Auth...',
+                    'DIAGNOSTIC RESOLUTION: Completed planetary catalog indexing and satellite path visuals.',
+                ]
             }
         };
 
