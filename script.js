@@ -1,1269 +1,525 @@
-/**
- * Spaceship Cockpit HUD Core & Orchestration Script
- * Bundles Starfield, Audio Synthesizer, Subspace CLI, and HUD controllers into a single file
- * to enable running on local filesystems (bypassing browser module CORS constraints).
- */
+/* ==========================================================================
+   Panth Haveliwala: Portfolio interactions
+   Content comes from data.js (window.PORTFOLIO)
+   ========================================================================== */
+(() => {
+  "use strict";
 
-// ==========================================
-// 1. 3D Starfield Engine
-// ==========================================
-class Starfield {
-    constructor(canvasId) {
-        this.canvas = document.getElementById(canvasId);
-        if (!this.canvas) return;
-        
-        this.ctx = this.canvas.getContext('2d');
-        this.stars = [];
-        this.numStars = 450;
-        this.baseSpeed = 0.8;
-        this.speed = this.baseSpeed;
-        this.targetSpeed = this.baseSpeed;
-        this.warpFactor = 1.0;
-        this.maxDepth = 1000;
-        
-        // Steering offsets
-        this.offsetX = 0;
-        this.offsetY = 0;
-        this.targetOffsetX = 0;
-        this.targetOffsetY = 0;
-        
-        this.init();
-        this.bindEvents();
-    }
-    
-    init() {
-        this.resize();
-        
-        this.stars = [];
-        for (let i = 0; i < this.numStars; i++) {
-            this.stars.push({
-                x: (Math.random() - 0.5) * this.canvas.width * 2,
-                y: (Math.random() - 0.5) * this.canvas.height * 2,
-                z: Math.random() * this.maxDepth,
-                color: this.getRandomColor()
-            });
-        }
-    }
-    
-    getRandomColor() {
-        const colors = [
-            'rgba(0, 240, 255, ',   // Cyan
-            'rgba(157, 0, 255, ',   // Purple
-            'rgba(255, 0, 127, ',   // Pink
-            'rgba(255, 255, 255, '  // White
-        ];
-        if (Math.random() > 0.3) {
-            return colors[3];
-        }
-        return colors[Math.floor(Math.random() * 3)];
-    }
-    
-    resize() {
-        this.canvas.width = window.innerWidth;
-        this.canvas.height = window.innerHeight;
-    }
-    
-    bindEvents() {
-        window.addEventListener('resize', () => this.resize());
-        
-        window.addEventListener('mousemove', (e) => {
-            const x = (e.clientX / window.innerWidth) - 0.5;
-            const y = (e.clientY / window.innerHeight) - 0.5;
-            this.targetOffsetX = -x * 8;
-            this.targetOffsetY = -y * 8;
-        });
-        
-        let scrollTimeout;
-        window.addEventListener('scroll', () => {
-            this.targetSpeed = this.baseSpeed * 8;
-            clearTimeout(scrollTimeout);
-            scrollTimeout = setTimeout(() => {
-                this.targetSpeed = this.baseSpeed * this.warpFactor;
-            }, 300);
-        });
-    }
-    
-    setWarpFactor(factor) {
-        this.warpFactor = factor;
-        this.targetSpeed = this.baseSpeed * factor;
-    }
-    
-    start() {
-        const loop = () => {
-            this.update();
-            this.draw();
-            requestAnimationFrame(loop);
-        };
-        requestAnimationFrame(loop);
-    }
-    
-    update() {
-        this.speed += (this.targetSpeed - this.speed) * 0.05;
-        this.offsetX += (this.targetOffsetX - this.offsetX) * 0.05;
-        this.offsetY += (this.targetOffsetY - this.offsetY) * 0.05;
-        
-        for (let i = 0; i < this.stars.length; i++) {
-            const star = this.stars[i];
-            star.z -= this.speed;
-            star.x += this.offsetX * (this.speed * 0.15);
-            star.y += this.offsetY * (this.speed * 0.15);
-            
-            if (star.z <= 0) {
-                star.z = this.maxDepth;
-                star.x = (Math.random() - 0.5) * this.canvas.width * 2;
-                star.y = (Math.random() - 0.5) * this.canvas.height * 2;
-            }
-        }
-    }
-    
-    draw() {
-        const alpha = this.speed > 5 ? 0.15 : 0.45;
-        this.ctx.fillStyle = `rgba(4, 4, 12, ${alpha})`;
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        
-        const centerX = this.canvas.width / 2;
-        const centerY = this.canvas.height / 2;
-        const fov = 180;
-        
-        for (let i = 0; i < this.stars.length; i++) {
-            const star = this.stars[i];
-            const px = (star.x / star.z) * fov + centerX;
-            const py = (star.y / star.z) * fov + centerY;
-            
-            if (px < 0 || px > this.canvas.width || py < 0 || py > this.canvas.height) {
-                continue;
-            }
-            
-            const opacity = Math.min(1, (1 - star.z / this.maxDepth) * 1.5);
-            this.ctx.strokeStyle = star.color + opacity + ')';
-            this.ctx.fillStyle = star.color + opacity + ')';
-            
-            if (this.speed > 2.5) {
-                const prevZ = star.z + this.speed * 1.8;
-                const ppx = (star.x / prevZ) * fov + centerX;
-                const ppy = (star.y / prevZ) * fov + centerY;
-                
-                this.ctx.beginPath();
-                this.ctx.lineWidth = Math.min(2.5, (1 - star.z / this.maxDepth) * 3);
-                this.ctx.moveTo(ppx, ppy);
-                this.ctx.lineTo(px, py);
-                this.ctx.stroke();
-            } else {
-                this.ctx.beginPath();
-                const radius = Math.min(2.0, (1 - star.z / this.maxDepth) * 2.5);
-                this.ctx.arc(px, py, radius, 0, Math.PI * 2);
-                this.ctx.fill();
-            }
-        }
-        
-        this.ctx.strokeStyle = 'rgba(0, 240, 255, 0.04)';
-        this.ctx.lineWidth = 1;
-        this.ctx.strokeRect(30, 30, this.canvas.width - 60, this.canvas.height - 60);
-    }
-}
+  const D = window.PORTFOLIO;
+  const $ = (s, el = document) => el.querySelector(s);
+  const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const finePointer = matchMedia("(hover: hover) and (pointer: fine)").matches;
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
-// ==========================================
-// 2. Web Audio API Sound Synthesizer
-// ==========================================
-class SoundSynthesizer {
-    constructor() {
-        this.ctx = null;
-        this.muted = false;
-        this.ambientOsc = null;
-        this.ambientGain = null;
-        this.ambientHumActive = false;
-        console.log("SoundSynthesizer constructor called.");
-    }
-    
-    initContext() {
-        try {
-            if (this.ctx) {
-                if (this.ctx.state === 'suspended') {
-                    console.log("Resuming suspended AudioContext...");
-                    this.ctx.resume().then(() => {
-                        console.log("AudioContext resumed successfully. State:", this.ctx.state);
-                    }).catch(e => {
-                        console.warn("Failed to resume AudioContext:", e);
-                    });
-                }
-                return;
-            }
-            
-            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-            if (AudioContextClass) {
-                this.ctx = new AudioContextClass();
-                console.log("Created new AudioContext. State:", this.ctx.state);
-            } else {
-                console.error("Web Audio API is not supported in this browser.");
-            }
-        } catch (e) {
-            console.error("Failed to initialize AudioContext:", e);
-        }
-    }
-    
-    toggleMute() {
-        this.muted = !this.muted;
-        console.log("Sound effects toggled. Muted:", this.muted);
-        return this.muted;
-    }
-    
-    playHover() {
-        this.initContext();
-        if (this.muted || !this.ctx) return;
-        
-        try {
-            const time = this.ctx.currentTime;
-            const osc = this.ctx.createOscillator();
-            const gain = this.ctx.createGain();
-            
-            osc.connect(gain);
-            gain.connect(this.ctx.destination);
-            
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(800, time);
-            
-            gain.gain.setValueAtTime(0.12, time);
-            gain.gain.linearRampToValueAtTime(0.001, time + 0.06);
-            
-            osc.start(time);
-            osc.stop(time + 0.07);
-        } catch (e) {
-            console.warn("Error playing hover sound:", e);
-        }
-    }
-    
-    playClick() {
-        this.initContext();
-        if (this.muted || !this.ctx) return;
-        
-        try {
-            const time = this.ctx.currentTime;
-            const osc = this.ctx.createOscillator();
-            const gain = this.ctx.createGain();
-            
-            osc.connect(gain);
-            gain.connect(this.ctx.destination);
-            
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(600, time);
-            osc.frequency.linearRampToValueAtTime(950, time + 0.07);
-            
-            gain.gain.setValueAtTime(0.20, time);
-            gain.gain.linearRampToValueAtTime(0.001, time + 0.08);
-            
-            osc.start(time);
-            osc.stop(time + 0.09);
-        } catch (e) {
-            console.warn("Error playing click sound:", e);
-        }
-    }
-    
-    playError() {
-        this.initContext();
-        if (this.muted || !this.ctx) return;
-        
-        try {
-            const time = this.ctx.currentTime;
-            const osc = this.ctx.createOscillator();
-            const gain = this.ctx.createGain();
-            
-            osc.connect(gain);
-            gain.connect(this.ctx.destination);
-            
-            osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(220, time);
-            osc.frequency.linearRampToValueAtTime(110, time + 0.18);
-            
-            gain.gain.setValueAtTime(0.20, time);
-            gain.gain.linearRampToValueAtTime(0.001, time + 0.2);
-            
-            osc.start(time);
-            osc.stop(time + 0.22);
-        } catch (e) {
-            console.warn("Error playing error sound:", e);
-        }
-    }
-    
-    playBootSequence() {
-        this.initContext();
-        if (this.muted || !this.ctx) return;
-        
-        try {
-            const time = this.ctx.currentTime;
-            
-            const osc1 = this.ctx.createOscillator();
-            const gain1 = this.ctx.createGain();
-            osc1.connect(gain1);
-            gain1.connect(this.ctx.destination);
-            osc1.type = 'sine';
-            osc1.frequency.setValueAtTime(100, time);
-            osc1.frequency.linearRampToValueAtTime(1200, time + 1.2);
-            gain1.gain.setValueAtTime(0.02, time);
-            gain1.gain.linearRampToValueAtTime(0.15, time + 0.6);
-            gain1.gain.linearRampToValueAtTime(0.001, time + 1.2);
-            osc1.start(time);
-            osc1.stop(time + 1.3);
-            
-            setTimeout(() => {
-                if (this.muted || !this.ctx) return;
-                try {
-                    const osc2 = this.ctx.createOscillator();
-                    const gain2 = this.ctx.createGain();
-                    osc2.connect(gain2);
-                    gain2.connect(this.ctx.destination);
-                    osc2.type = 'triangle';
-                    osc2.frequency.setValueAtTime(440, this.ctx.currentTime);
-                    osc2.frequency.setValueAtTime(554.37, this.ctx.currentTime + 0.2);
-                    osc2.frequency.setValueAtTime(659.25, this.ctx.currentTime + 0.4);
-                    gain2.gain.setValueAtTime(0.20, this.ctx.currentTime);
-                    gain2.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + 0.8);
-                    osc2.start(this.ctx.currentTime);
-                    osc2.stop(this.ctx.currentTime + 0.9);
-                } catch (e) {
-                    console.warn("Error playing boot chord:", e);
-                }
-            }, 300);
-        } catch (e) {
-            console.warn("Error playing boot sequence:", e);
-        }
-    }
+  /* ---------- Icons ---------- */
+  const ICONS = {
+    code: '<path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/>',
+    brain: '<path d="M9.5 2a2.5 2.5 0 0 0-2.4 3.2A3 3 0 0 0 4.5 9a3 3 0 0 0 .4 5.6A3 3 0 0 0 9 19.5 2.5 2.5 0 0 0 12 21V4.5A2.5 2.5 0 0 0 9.5 2zM14.5 2A2.5 2.5 0 0 1 16.9 5.2 3 3 0 0 1 19.5 9a3 3 0 0 1-.4 5.6A3 3 0 0 1 15 19.5 2.5 2.5 0 0 1 12 21"/>',
+    layout: '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/>',
+    server: '<rect x="2" y="3" width="20" height="8" rx="2"/><rect x="2" y="13" width="20" height="8" rx="2"/><path d="M6 7h.01M6 17h.01"/>',
+    database: '<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5M3 12c0 1.7 4 3 9 3s9-1.3 9-3"/>',
+    shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>',
+    phone: '<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/>',
+    tool: '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/>',
+    vault: '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="12" cy="12" r="3.5"/><path d="M12 8.5V7M12 17v-1.5M15.5 12H17M7 12h1.5"/>',
+    eye: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+    rocket: '<path d="M4.5 16.5c-1.5 1.3-2 5-2 5s3.7-.5 5-2c.7-.8.7-2.1-.1-2.9a2.2 2.2 0 0 0-2.9-.1zM12 15l-3-3a22 22 0 0 1 2-4A13 13 0 0 1 22 2c0 2.7-.8 7.5-6 11a22 22 0 0 1-4 2z"/><path d="M9 12H4s.6-3 2-4c1.6-1.1 5 0 5 0M12 15v5s3-.6 4-2c1.1-1.6 0-5 0-5"/>',
+    heart: '<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>',
+    arrow: '<path d="M7 17 17 7M8 7h9v9"/>',
+    ext: '<path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>',
+    github: '<path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.9a3.4 3.4 0 0 0-.9-2.6c3.1-.4 6.4-1.5 6.4-7A5.4 5.4 0 0 0 20 4.8 5 5 0 0 0 19.9 1S18.7.7 16 2.5a13.4 13.4 0 0 0-7 0C6.3.7 5.1 1 5.1 1A5 5 0 0 0 5 4.8a5.4 5.4 0 0 0-1.5 3.7c0 5.4 3.3 6.6 6.4 7a3.4 3.4 0 0 0-.9 2.6V22"/>',
+    hash: '<path d="M4 9h16M4 15h16M10 3 8 21M16 3l-2 18"/>',
+    mail: '<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/>',
+    copy: '<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
+    sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2"/>',
+  };
+  const icon = (name) => `<svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[name] || ICONS.code}</svg>`;
+  const PROJECT_ICON = { nyayavault: "vault", veritas: "eye", startin: "rocket", guardian: "heart" };
+  const ACH_ICON = { academic: "🥇", hackathon: "🏆", cert: "📜" };
 
-    toggleAmbientHum() {
-        this.initContext();
-        if (!this.ctx) return false;
-        
-        try {
-            if (this.ctx.state === 'suspended') {
-                console.log("Resuming AudioContext for ambient hum...");
-                this.ctx.resume();
-            }
-
-            if (this.ambientHumActive) {
-                console.log("Stopping ambient hum...");
-                if (this.ambientOsc) {
-                    try {
-                        this.ambientOsc.stop();
-                    } catch(e) {}
-                    this.ambientOsc = null;
-                }
-                this.ambientHumActive = false;
-            } else {
-                if (this.muted) {
-                    console.log("Cannot start ambient hum: muted state is active.");
-                    return false;
-                }
-                
-                console.log("Starting ambient hum oscillator (58Hz triangle)...");
-                const time = this.ctx.currentTime;
-                
-                this.ambientOsc = this.ctx.createOscillator();
-                this.ambientGain = this.ctx.createGain();
-                const lowpass = this.ctx.createBiquadFilter();
-                
-                this.ambientOsc.connect(lowpass);
-                lowpass.connect(this.ambientGain);
-                this.ambientGain.connect(this.ctx.destination);
-                
-                this.ambientOsc.type = 'triangle';
-                this.ambientOsc.frequency.setValueAtTime(58, time);
-                
-                lowpass.type = 'lowpass';
-                lowpass.frequency.setValueAtTime(100, time);
-                
-                this.ambientGain.gain.setValueAtTime(0.20, time);
-                
-                this.ambientOsc.start(time);
-                this.ambientHumActive = true;
-            }
-        } catch (e) {
-            console.error("Error toggling ambient hum:", e);
-        }
-        
-        return this.ambientHumActive;
-    }
-}
-
-// ==========================================
-// 3. Subspace Terminal CLI
-// ==========================================
-class InteractiveTerminal {
-    constructor(screenId, inputId, options = {}) {
-        this.screen = document.getElementById(screenId);
-        this.input = document.getElementById(inputId);
-        this.onWarp = options.onWarp || (() => {});
-        this.playSound = options.playSound || (() => {});
-        this.playError = options.playError || (() => {});
-        
-        if (this.input) {
-            this.input.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    this.executeCommand(this.input.value);
-                    this.input.value = '';
-                }
-            });
-        }
-    }
-    
-    executeCommand(cmdRaw) {
-        const cmdTrimmed = cmdRaw.trim();
-        if (cmdTrimmed === '') return;
-        
-        const args = cmdTrimmed.split(' ');
-        const primaryCmd = args[0].toLowerCase();
-        
-        this.writeLine(`visitor@portfolio-cli:~$ ${cmdRaw}`, 'command-sent');
-        this.playSound();
-        
-        switch (primaryCmd) {
-            case 'help':
-                this.printHelp();
-                break;
-            case 'about':
-            case 'bio':
-                this.printAbout();
-                break;
-            case 'skills':
-            case 'tech':
-                this.printSkills();
-                break;
-            case 'projects':
-            case 'deployments':
-                this.printProjects();
-                break;
-            case 'achievements':
-            case 'records':
-                this.printAchievements();
-                break;
-            case 'contact':
-            case 'mail':
-                this.printContact();
-                break;
-            case 'warp':
-                this.executeWarp(args[1]);
-                break;
-            case 'system-check':
-            case 'diagnostics':
-                this.executeDiagnostics();
-                break;
-            case 'clear':
-                this.screen.innerHTML = '';
-                break;
-            default:
-                this.writeLine(`ERR: Command '${primaryCmd}' not recognized. Type 'help' for available subsystems.`, 'text-pink');
-                this.playError();
-        }
-        
-        setTimeout(() => {
-            this.screen.scrollTop = this.screen.scrollHeight;
-        }, 50);
-    }
-    
-    writeLine(text, className = '') {
-        const row = document.createElement('div');
-        row.className = `terminal-output-row ${className}`;
-        
-        const line = document.createElement('span');
-        line.className = 'line-content';
-        line.innerHTML = text;
-        
-        row.appendChild(line);
-        this.screen.appendChild(row);
-    }
-    
-    printHelp() {
-        this.writeLine('----------------------------------------------------', 'text-muted');
-        this.writeLine('AVAILABLE PORTFOLIO TERMINAL COMMANDS:', 'text-cyan');
-        this.writeLine('  about        - View developer biographical details');
-        this.writeLine('  skills       - Query tech stack configurations & skills');
-        this.writeLine('  projects     - Query software engineering project databases');
-        this.writeLine('  achievements - Read academic logs & hackathon records');
-        this.writeLine('  contact      - Display communication email & links');
-        this.writeLine('  diagnostics  - Launch complete systems self-diagnostics');
-        this.writeLine('  warp <val>   - Set background starfield warp speed (E.g. warp 5.0)');
-        this.writeLine('  clear        - Flush local console log buffer');
-        this.writeLine('----------------------------------------------------', 'text-muted');
-    }
-    
-    printAbout() {
-        this.writeLine('----------------------------------------------------', 'text-muted');
-        this.writeLine('DEVELOPER BIO: PANTH HAVELIWALA', 'text-purple');
-        this.writeLine('ROLE: B.Tech Computer Engineering Student (Class of 2028)');
-        this.writeLine('STATION: SVKM\'s NMIMS MPSTME, Shirpur Campus');
-        this.writeLine('LOCATION: Valsad, Gujarat, India');
-        this.writeLine('STATUS: Academic Batch Topper (Rank 1, CGPA 8.54 / 3rd Sem GPA: 9.41)');
-        this.writeLine('');
-        this.writeLine('CAREER FOCUS: Building scalable AI-driven cybersecurity models, lightweight edge neural networks, and high-performance full-stack dashboards. Actively serving as Technical Lead during Hackathons.', 'text-blue');
-        this.writeLine('----------------------------------------------------', 'text-muted');
-    }
-    
-    printSkills() {
-        this.writeLine('----------------------------------------------------', 'text-muted');
-        this.writeLine('CAPABILITY LOGS:', 'text-cyan');
-        this.writeLine('  [LANGUAGES]:  Python, C++, C, Java, JavaScript, SQL, HTML5, CSS3', 'text-white');
-        this.writeLine('  [FRAMEWORKS]: React, Django, Flask, Streamlit, Flutter, TensorFlow Lite', 'text-white');
-        this.writeLine('  [LIBRARIES]:  Pandas, Scikit-Learn, Folium, TF-IDF Vectorizers', 'text-white');
-        this.writeLine('  [DATA STORAGE]: MongoDB, Firebase Firestore / Realtime DB', 'text-white');
-        this.writeLine('  [OPERATIONAL]: Git/Github, Vercel, Render Cloud, Edge Deployments', 'text-white');
-        this.writeLine('----------------------------------------------------', 'text-muted');
-    }
-    
-    printProjects() {
-        this.writeLine('----------------------------------------------------', 'text-muted');
-        this.writeLine('PROJECT DEPLOYMENT HISTORY:', 'text-pink');
-        this.writeLine('');
-        this.writeLine('1. GUARDIAN AI: Real-Time Fall Detection System (Jan 2026)', 'text-cyan');
-        this.writeLine('   - Objective: Monitor & detect falls to protect elderly individuals.');
-        this.writeLine('   - Tech: TensorFlow Lite neural net + Flask API + React dashboard + Firebase FCM notifications.');
-        this.writeLine('');
-        this.writeLine('2. CLOUD ANOMALY DETECTOR: Geofencing Security Shield (Sep 2025)', 'text-purple');
-        this.writeLine('   - Objective: Stop account takeovers by identifying anomalous access events.');
-        this.writeLine('   - Tech: Python, Scikit-learn, Pandas, AI Classifier models.');
-        this.writeLine('');
-        this.writeLine('3. LOC-TRACER: Location Tracking Dashboard (Oct 2025)', 'text-pink');
-        this.writeLine('   - Objective: Index multi-point coordinates logs and overlay visual layers.');
-        this.writeLine('   - Tech: Streamlit interface, Pandas dataset manipulation, Folium maps.');
-        this.writeLine('');
-        this.writeLine('4. RECOMMENDER CORE: Semantic Recommendation Engine (Mar 2025)', 'text-blue');
-        this.writeLine('   - Objective: Solve descriptions matches with movie databases.');
-        this.writeLine('   - Tech: Python, TF-IDF Vectorization, Cosine Similarity, Streamlit.');
-        this.writeLine('');
-        this.writeLine('5. PLANT DISEASE DETECTION: Crop Health Identification System (Mar 2025)', 'text-green');
-        this.writeLine('   - Objective: Identify crop leaf diseases to assist farming operations.');
-        this.writeLine('   - Tech: Python, TensorFlow CNN models, Image Processing.');
-        this.writeLine('');
-        this.writeLine('6. URBAN ORBIT: Citizen Reporting & Government Dashboard (Apr 2026)', 'text-cyan');
-        this.writeLine('   - Objective: Connect citizens with municipal systems to report and coordinate issues.');
-        this.writeLine('   - Tech: React, Vite, Firebase Auth/Firestore, Tailwind CSS.');
-        this.writeLine('');
-        this.writeLine('7. SPACE SCOPE: Astronomy Catalog Telemetry Interface (May 2026)', 'text-purple');
-        this.writeLine('   - Objective: Render planetary catalogs and track cosmic satellite paths.');
-        this.writeLine('   - Tech: MERN Stack (Node, Express, React, MongoDB), Google Auth.');
-        this.writeLine('----------------------------------------------------', 'text-muted');
-    }
-    
-    printAchievements() {
-        this.writeLine('----------------------------------------------------', 'text-muted');
-        this.writeLine('OFFICIAL ACADEMIC & HACKATHON LOG:', 'text-cyan');
-        this.writeLine('  - [BATCH TOPPER]: Ranked 1st in B.Tech CE (3rd sem) with a 9.41 GPA.', 'text-white');
-        this.writeLine('  - [HACKATHON LEAD]: Led engineering squads to a Top 3 finish in Inter-College Hackathon.', 'text-white');
-        this.writeLine('  - [DSA CERTIFICATION]: Earned NPTEL Data Structures & Algorithms verification (Nov 2025).', 'text-white');
-        this.writeLine('  - [HACKERRANK SHIELDS]: 5-Star ratings in both Python & C++ compilers.', 'text-white');
-        this.writeLine('----------------------------------------------------', 'text-muted');
-    }
-    
-    printContact() {
-        this.writeLine('----------------------------------------------------', 'text-muted');
-        this.writeLine('COMMUNICATION FREQUENCIES:', 'text-pink');
-        this.writeLine('  - EMAIL ADDRESS : panthhaveliwala@gmail.com');
-        this.writeLine('  - LINKEDIN NODE : linkedin.com/in/panth-haveliwala-06811131a');
-        this.writeLine('  - GITHUB HUBS   : github.com/PANTH2517');
-        this.writeLine('  - BASE LOCATION : Valsad, Gujarat, India');
-        this.writeLine('----------------------------------------------------', 'text-muted');
-    }
-    
-    executeWarp(factorStr) {
-        if (!factorStr) {
-            this.writeLine('ERR: Warp requires a speed parameter. Usage: warp <factor> (E.g. warp 5.0)', 'text-pink');
-            this.playError();
-            return;
-        }
-        
-        const factor = parseFloat(factorStr);
-        if (isNaN(factor) || factor < 0.1 || factor > 30) {
-            this.writeLine('ERR: Starfield warp factor must be between 0.1 and 30.0.', 'text-pink');
-            this.playError();
-            return;
-        }
-        
-        this.writeLine(`STARFIELD PROPULSION ONLINE: ACCELERATING WARP FACTOR TO ${factor.toFixed(1)}...`, 'text-green');
-        this.onWarp(factor);
-    }
-    
-    executeDiagnostics() {
-        this.writeLine('LAUNCHING MAIN SYSTEM DIAGNOSTICS...', 'text-cyan');
-        
-        const stages = [
-            { text: '  [0.4s] Querying background starfield warp factor...', style: 'text-muted' },
-            { text: '  [0.8s] STARFIELD BACKGROUND ENGINE: ACTIVE & STABLE', style: 'text-white' },
-            { text: '  [1.2s] Querying cognitive technical skills databases...', style: 'text-muted' },
-            { text: '  [1.6s] PYTHON ENGINE VERIFICATION: 95% ATTRIBUTE LOADED', style: 'text-white' },
-            { text: '  [2.0s] ALGOS CORE (NPTEL CERT): ONLINE [NOMINAL]', style: 'text-white' },
-            { text: '  [2.4s] Establishing link with database arrays (MongoDB, Firebase)...', style: 'text-muted' },
-            { text: '  [2.8s] STORAGE CONNECTION: ESTABLISHED', style: 'text-white' },
-            { text: '  [3.2s] CORE COMPUTATION UNITS: ALL NODES FUNCTIONING AT 60 FPS', style: 'text-green' },
-            { text: 'SYSTEM CHECK COMPLETE. PORTFOLIO SECURITY INTEGRITY NOMINAL.', style: 'text-green' }
-        ];
-        
-        stages.forEach((stage, idx) => {
-            setTimeout(() => {
-                this.writeLine(stage.text, stage.style);
-                this.screen.scrollTop = this.screen.scrollHeight;
-                this.playSound();
-            }, (idx + 1) * 400);
-        });
-    }
-}
-
-// ==========================================
-// 4. Cockpit HUD Controller
-// ==========================================
-class HudController {
-    constructor(soundSynth) {
-        this.soundSynth = soundSynth;
-        
-        this.projectsDb = {
-            'guardian-ai': {
-                title: 'GUARDIAN AI - PROJECT REPORT',
-                score: 94,
-                threads: '8 PROCESSORS',
-                impact: 'HIGH PRIORITY [LIFE-SAFETY]',
-                logs: [
-                    'SYSTEM: Powering up fall classification networks...',
-                    'MODEL WEIGHTS: Loaded (Lightweight MobileNet Backbone)',
-                    'BACKEND: Flask API service status [NOMINAL] // Ping: 12ms',
-                    'NOTIFIER: Firebase Cloud Messaging connection online',
-                    'EDGE ENGINE: TensorFlow Lite model running at 30ms inference latency',
-                    'PROJECT OUTCOME: 100% telemetry routing achieved. Verified in real-time environments to secure prompt alert times.',
-                ]
-            },
-            'cloud-security': {
-                title: 'CLOUD LOGIN ANOMALY DETECTION',
-                score: 89,
-                threads: '4 CORE ENGINES',
-                impact: 'MEDIUM PRIORITY [ACCESS CONTROL]',
-                logs: [
-                    'SYSTEM: Geofencing classifier parameters established...',
-                    'ANOMALY VECTOR: Scikit-learn random forest model active',
-                    'DATASET: Indexing geo-coordinates logs using Pandas...',
-                    'IMPOSSIBLE TRAVEL ALGO: Tracking user access log timestamps...',
-                    'MITIGATION ENGINE: Flagging dictionary scans & geolocation anomalies',
-                    'PROJECT OUTCOME: 98.4% malicious authentication attempts deflected. Secured DA-IICT Hackathon database logs.',
-                ]
-            },
-            'loc-tracer': {
-                title: 'LOC-TRACER STATUS REPORT',
-                score: 87,
-                threads: '2 VISUAL CORES',
-                impact: 'UTILITY [GEOSPATIAL]',
-                logs: [
-                    'SYSTEM: Loading interactive visual mapping overlays...',
-                    'UI SHELL: Streamlit dashboards loading assets...',
-                    'DATA PIPELINE: Cleaning coordinate sheets in Pandas formats',
-                    'MAP MATRIX: Folium Leaflet mapping canvas initialized',
-                    'PROJECT OUTCOME: Zero anomalies detected in coordinate tracks. 100% path resolution rendering completed.',
-                ]
-            },
-            'recommender': {
-                title: 'MOVIE RECOMMENDATION SYSTEM',
-                score: 91,
-                threads: '16 THREADS',
-                impact: 'UTILITY [SEARCH]',
-                logs: [
-                    'SYSTEM: Scanning semantic database clusters...',
-                    'TF-IDF MATRIX: Document term frequencies vectors created',
-                    'CORRELATION: Cosine similarity indices computed',
-                    'RESOLVER: Streamlit web console online',
-                    'PROJECT OUTCOME: Semantic recommendation complete. Successfully bypassed cold-start index blockages.',
-                ]
-            },
-            'plant-disease': {
-                title: 'ECOROUTE DIAGNOSTICS REPORT',
-                score: 92,
-                threads: '12 COMPUTE UNIT CORES',
-                impact: 'MEDIUM PRIORITY [GREEN NAVIGATION]',
-                logs: [
-                    'SYSTEM: Powering up greenest pathway optimization matrix...',
-                    'MAP LAYERS: Fetching carbon footprint index feeds...',
-                    'ROUTING ENGINE: Calculating eco-friendly paths via Leaflet...',
-                    'UI SHELL: Initializing React-based map container overlays...',
-                    'PROJECT OUTCOME: 100% path resolution rendering completed. Successfully calculated minimal carbon paths.',
-                ]
-            },
-            'urban-orbit': {
-                title: 'ROOMFIX COMPLAINT DATABASE LOGS',
-                score: 95,
-                threads: 'SECURE DBMS RULES',
-                impact: 'HIGH PRIORITY [HOSTEL MANAGEMENT]',
-                logs: [
-                    'SYSTEM: Initiating RoomFix complaint dashboard queries...',
-                    'DATABASE NODE: Connecting hostel maintenance tables...',
-                    'RESOLVER ENGINE: Assigning room repair priority queues...',
-                    'UI SHELL: Loading Angular web interface templates...',
-                    'PROJECT OUTCOME: RoomFix hostel DBMS platform online. Bypassed database connection bottlenecks.',
-                ]
-            },
-            'space-scope': {
-                title: 'SPACE SCOPE TELEMETRY LOGS',
-                score: 93,
-                threads: 'MERN STACK DATA PIPELINE',
-                impact: 'HIGH PRIORITY [CELESTIAL OBS]',
-                logs: [
-                    'SYSTEM: Initiating astronomical data feeds...',
-                    'FRONTEND: Vite SPA production build completed...',
-                    'BACKEND: Express API server active on Render cloud...',
-                    'OAUTH HANDLER: Authenticating credentials via Google Auth...',
-                    'PROJECT OUTCOME: Completed planetary catalog indexing and satellite path visuals.',
-                ]
-            }
-        };
-
-        this.initClock();
-        this.initMiniMonitor();
-        this.initSkillsTabs();
-        this.initProjectFilters();
-        this.initDiagnosticsModal();
-        this.initContactForm();
-    }
-    
-    initClock() {
-        const clockEl = document.getElementById('hud-clock');
-        if (!clockEl) return;
-        
-        const updateTime = () => {
-            const now = new Date();
-            const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-            const istOffset = 5.5 * 3600000;
-            const istTime = new Date(utc + istOffset);
-            
-            const hours = String(istTime.getHours()).padStart(2, '0');
-            const minutes = String(istTime.getMinutes()).padStart(2, '0');
-            const seconds = String(istTime.getSeconds()).padStart(2, '0');
-            
-            clockEl.textContent = `${hours}:${minutes}:${seconds}`;
-        };
-        
-        updateTime();
-        setInterval(updateTime, 1000);
-    }
-    
-    initMiniMonitor() {
-        const canvas = document.getElementById('hud-minimonitor');
-        if (!canvas) return;
-        const ctx = canvas.getContext('2d');
-        
-        const points = Array(35).fill(40);
-        let timeOffset = 0;
-        
-        const drawMonitor = () => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            points.shift();
-            
-            timeOffset += 0.15;
-            const baseValue = 50 + Math.sin(timeOffset) * 15;
-            const spike = Math.random() > 0.92 ? (Math.random() - 0.5) * 30 : 0;
-            const newValue = Math.max(10, Math.min(90, baseValue + spike));
-            points.push(newValue);
-            
-            ctx.strokeStyle = 'rgba(0, 240, 255, 0.05)';
-            ctx.lineWidth = 1;
-            for (let i = 20; i < canvas.width; i += 20) {
-                ctx.beginPath();
-                ctx.moveTo(i, 0);
-                ctx.lineTo(i, canvas.height);
-                ctx.stroke();
-            }
-            for (let j = 20; j < canvas.height; j += 20) {
-                ctx.beginPath();
-                ctx.moveTo(0, j);
-                ctx.lineTo(canvas.width, j);
-                ctx.stroke();
-            }
-            
-            const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-            grad.addColorStop(0, 'rgba(0, 240, 255, 0.25)');
-            grad.addColorStop(1, 'rgba(0, 240, 255, 0)');
-            
-            ctx.fillStyle = grad;
-            ctx.beginPath();
-            ctx.moveTo(0, canvas.height);
-            
-            const step = canvas.width / (points.length - 1);
-            for (let i = 0; i < points.length; i++) {
-                const x = i * step;
-                const y = canvas.height - (points[i] / 100) * canvas.height;
-                ctx.lineTo(x, y);
-            }
-            
-            ctx.lineTo(canvas.width, canvas.height);
-            ctx.closePath();
-            ctx.fill();
-            
-            ctx.strokeStyle = '#00f0ff';
-            ctx.lineWidth = 1.5;
-            ctx.shadowBlur = 4;
-            ctx.shadowColor = 'rgba(0, 240, 255, 0.5)';
-            
-            ctx.beginPath();
-            for (let i = 0; i < points.length; i++) {
-                const x = i * step;
-                const y = canvas.height - (points[i] / 100) * canvas.height;
-                if (i === 0) ctx.moveTo(x, y);
-                else ctx.lineTo(x, y);
-            }
-            ctx.stroke();
-            
-            ctx.shadowBlur = 0;
-            requestAnimationFrame(drawMonitor);
-        };
-        
-        drawMonitor();
-    }
-    
-    triggerTypewriter(elementId, text, speed = 12) {
-        const el = document.getElementById(elementId);
-        if (!el) return;
-        
-        if (el.typewriterTimeout) {
-            clearTimeout(el.typewriterTimeout);
-        }
-        
-        el.textContent = '';
-        let index = 0;
-        
-        const type = () => {
-            if (index < text.length) {
-                el.textContent += text.charAt(index);
-                index++;
-                if (index % 3 === 0 && this.soundSynth) {
-                    this.soundSynth.playHover();
-                }
-                el.typewriterTimeout = setTimeout(type, speed);
-            } else {
-                el.typewriterTimeout = null;
-            }
-        };
-        
-        type();
-    }
-    
-    initSkillsTabs() {
-        const tabBtns = document.querySelectorAll('.skill-tab-btn');
-        tabBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                this.soundSynth.playClick();
-                
-                document.querySelectorAll('.skill-tab-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                
-                document.querySelectorAll('.skills-tab-content').forEach(c => c.classList.remove('active'));
-                
-                const tabName = btn.getAttribute('data-tab');
-                const contentEl = document.getElementById(`skills-${tabName}`);
-                if (contentEl) {
-                    contentEl.classList.add('active');
-                    
-                    const progressBars = contentEl.querySelectorAll('.progress-fill');
-                    progressBars.forEach(bar => {
-                        const targetWidth = bar.style.width;
-                        bar.style.width = '0%';
-                        setTimeout(() => {
-                            bar.style.width = targetWidth;
-                        }, 50);
-                    });
-                }
-            });
-        });
-    }
-    
-    initProjectFilters() {
-        const filterBtns = document.querySelectorAll('.filter-btn');
-        const cards = document.querySelectorAll('.project-card');
-        
-        filterBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                this.soundSynth.playClick();
-                
-                filterBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                
-                const filter = btn.getAttribute('data-filter');
-                cards.forEach(card => {
-                    const categories = card.getAttribute('data-category').split(' ');
-                    if (filter === 'all' || categories.includes(filter)) {
-                        card.style.display = 'flex';
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
-            });
-        });
-    }
-    
-    initDiagnosticsModal() {
-        const modal = document.getElementById('diagnostic-modal');
-        const closeBtn = document.getElementById('modal-close');
-        const titleEl = document.getElementById('modal-project-title');
-        const detailsEl = document.getElementById('modal-project-details');
-        const threadsEl = document.getElementById('modal-project-threads');
-        const impactEl = document.getElementById('modal-project-impact');
-        const gaugeScore = document.getElementById('modal-project-score-text');
-        const gaugePath = document.getElementById('modal-project-score-path');
-        
-        const diagnoseBtns = document.querySelectorAll('.btn-diagnose');
-        
-        diagnoseBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const projectId = btn.getAttribute('data-project');
-                const project = this.projectsDb[projectId];
-                if (!project) return;
-                
-                this.soundSynth.playClick();
-                
-                titleEl.textContent = project.title;
-                threadsEl.textContent = project.threads;
-                impactEl.textContent = project.impact;
-                gaugeScore.textContent = `${project.score}%`;
-                
-                gaugePath.setAttribute('stroke-dasharray', `${project.score}, 100`);
-                
-                detailsEl.innerHTML = '';
-                project.logs.forEach((log, idx) => {
-                    setTimeout(() => {
-                        const row = document.createElement('div');
-                        row.className = 'diag-row';
-                        row.innerHTML = `<span class="diag-label">&gt;&gt;</span> ${log}`;
-                        detailsEl.appendChild(row);
-                        detailsEl.scrollTop = detailsEl.scrollHeight;
-                        this.soundSynth.playHover();
-                    }, (idx + 1) * 300);
-                });
-                
-                modal.classList.remove('hidden');
-            });
-        });
-        
-        const closeModal = () => {
-            this.soundSynth.playClick();
-            modal.classList.add('hidden');
-        };
-        
-        closeBtn.addEventListener('click', closeModal);
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) closeModal();
-        });
-    }
-    
-    initContactForm() {
-        const form = document.getElementById('comm-signal-form');
-        const submitBtn = document.getElementById('comms-submit-btn');
-        const telemetryFooter = document.getElementById('footer-telemetry-stream');
-        
-        if (!form) return;
-        
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            this.soundSynth.playClick();
-            
-            const name = document.getElementById('comms-name').value;
-            const email = document.getElementById('comms-email').value;
-            const msg = document.getElementById('comms-msg').value;
-            
-            const btnText = submitBtn.querySelector('.btn-text');
-            const originalText = btnText.textContent;
-            
-            btnText.textContent = 'TRANSMITTING SIGNAL...';
-            submitBtn.disabled = true;
-            
-            const radarSweep = document.querySelector('.radar-sweep');
-            if (radarSweep) {
-                radarSweep.style.background = 'conic-gradient(from 0deg, rgba(255, 0, 127, 0.4) 0deg, transparent 90deg)';
-            }
-            
-            // Send email directly to inbox in the background using FormSubmit API
-            fetch("https://formsubmit.co/ajax/panthhaveliwala@gmail.com", {
-                method: "POST",
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({
-                    name: name,
-                    email: email,
-                    message: msg,
-                    _subject: `New Portfolio Message from ${name}`
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                btnText.textContent = 'SIGNAL SENT';
-                this.soundSynth.playClick();
-                
-                if (telemetryFooter) {
-                    telemetryFooter.textContent = 'SECURE EMAIL TRANSMISSION INITIATED';
-                    telemetryFooter.classList.add('text-green');
-                }
-                
-                alert(`TRANSMISSION SUCCESSFUL!\nYour message has been sent directly to Panth Haveliwala.`);
-                
-                form.reset();
-                btnText.textContent = originalText;
-                submitBtn.disabled = false;
-                
-                if (radarSweep) {
-                    radarSweep.style.background = 'conic-gradient(from 0deg, rgba(0, 240, 255, 0.15) 0deg, transparent 90deg)';
-                }
-            })
-            .catch(error => {
-                console.warn("Direct transmission failed. Falling back to Gmail Compose tab.", error);
-                
-                // Fallback: Open Gmail Web Compose tab prefilled
-                const subject = encodeURIComponent(`Portfolio Message from ${name}`);
-                const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${msg}`);
-                const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=panthhaveliwala@gmail.com&su=${subject}&body=${body}`;
-                window.open(gmailUrl, '_blank');
-                
-                btnText.textContent = originalText;
-                submitBtn.disabled = false;
-                if (radarSweep) {
-                    radarSweep.style.background = 'conic-gradient(from 0deg, rgba(0, 240, 255, 0.15) 0deg, transparent 90deg)';
-                }
-            });
-        });
-    }
-}
-
-// ==========================================
-// 5. Main Orchestration & Boot sequence
-// ==========================================
-document.addEventListener('DOMContentLoaded', () => {
-    const starfield = new Starfield('starfield-canvas');
-    if (starfield) {
-        starfield.start();
-    }
-    
-    const soundSynth = new SoundSynthesizer();
-    
-    const bioTransmission = 
-`DEVELOPER PROFILE SUMMARY:
-I am a highly motivated B.Tech Computer Engineering student at SVKM's NMIMS Shirpur. As an AI & Full-Stack Web Developer, I specialize in engineering scalable AI/ML pipelines, real-time web applications, and robust cybersecurity solutions. 
-
-TECHNICAL LEADERSHIP & ACADEMICS:
-- Hackathon Team Lead: Commanded multi-disciplined squads of 2 to 5 members, translating abstract challenges into optimal, high-performance software and securing a Top 3 Finish in Inter-College Hackathons.
-- Academic Performance: Batch Topper in B.Tech CE (3rd Sem) with a 9.41 GPA and an overall CGPA of 8.54/10. Certified in Data Structures & Algorithms by NPTEL with an optimal algorithmic proficiency rating.
-
-PORTFOLIO HIGHLIGHTS & ARCHITECTURE:
-- Engineering Approach: Strict modular clean code patterns, security-first database controls, and agile prototyping methodologies.
-- Core Specializations: Python, JavaScript, React.js, Angular, Node.js, Express, Flask, Django, TF Lite, and Scikit-learn.
-- Data & Operations: MongoDB, Firebase Firestore, relational DBMS/SQL, Git/GitHub version control, Vercel, and Render Cloud deployments.`;
-
-    let hudController = null;
-    let terminalInstance = null;
-    
-    const bootProgress = document.getElementById('boot-progress');
-    const bootStatus = document.getElementById('boot-status');
-    const bootBtn = document.getElementById('boot-btn');
-    const bootScreen = document.getElementById('boot-screen');
-    
-    let progress = 0;
-    const loadStages = [
-        { limit: 20, status: 'ESTABLISHING DATA LINK CONNECTION...' },
-        { limit: 45, status: 'INITIALIZING PORTFOLIO ENGINE...' },
-        { limit: 70, status: 'PARSING TECHNICAL CAPABILITY STACKS...' },
-        { limit: 90, status: 'LOADING PROJECT DATABASES...' },
-        { limit: 100, status: 'PORTFOLIO COCKPIT SYSTEM READY.' }
-    ];
-    
-    const runBootSequence = () => {
-        const interval = setInterval(() => {
-            progress += Math.floor(Math.random() * 8) + 2;
-            if (progress >= 100) {
-                progress = 100;
-                clearInterval(interval);
-                
-                if (bootProgress) bootProgress.style.width = '100%';
-                if (bootStatus) {
-                    bootStatus.textContent = loadStages[4].status;
-                    bootStatus.classList.add('text-green');
-                }
-                
-                if (bootBtn) {
-                    bootBtn.classList.remove('disabled');
-                    bootBtn.disabled = false;
-                }
-            } else {
-                if (bootProgress) bootProgress.style.width = `${progress}%`;
-                
-                if (bootStatus) {
-                    const stage = loadStages.find(s => progress <= s.limit) || loadStages[4];
-                    bootStatus.textContent = `${stage.status} (${progress}%)`;
-                }
-            }
-        }, 80);
-    };
-    
-    runBootSequence();
-    
-    if (bootBtn) {
-        bootBtn.addEventListener('click', () => {
-            soundSynth.initContext();
-            soundSynth.playBootSequence();
-            
-            // Start continuous background hum automatically
-            soundSynth.toggleAmbientHum();
-            const ambientToggle = document.getElementById('ambient-toggle');
-            if (ambientToggle) {
-                ambientToggle.classList.add('active');
-            }
-            
-            if (bootScreen) {
-                bootScreen.classList.add('fade-out');
-            }
-            document.body.classList.remove('hud-booting');
-            
-            hudController = new HudController(soundSynth);
-            
-            // Mask the avatar photo immediately upon dashboard entry
-            setTimeout(updateScanlineMask, 100);
-            
-            setTimeout(() => {
-                if (hudController) {
-                    hudController.triggerTypewriter('hero-typewriter', bioTransmission, 15);
-                }
-            }, 1200);
-            
-            terminalInstance = new InteractiveTerminal('terminal-screen', 'terminal-cli-input', {
-                onWarp: (factor) => {
-                    if (starfield) {
-                        starfield.setWarpFactor(factor);
-                    }
-                    
-                    const warpValEl = document.getElementById('warp-factor-display');
-                    const warpBarEl = document.getElementById('warp-factor-bar');
-                    if (warpValEl) {
-                        warpValEl.textContent = `FACTOR ${factor.toFixed(1)}`;
-                    }
-                    if (warpBarEl) {
-                        const pct = Math.min(100, (factor / 15) * 100);
-                        warpBarEl.style.width = `${pct}%`;
-                        if (factor > 8) {
-                            warpBarEl.className = 'stat-bar bg-pink';
-                            warpValEl.className = 'stat-value text-pink';
-                        } else if (factor > 3) {
-                            warpBarEl.className = 'stat-bar bg-purple';
-                            warpValEl.className = 'stat-value text-purple';
-                        } else {
-                            warpBarEl.className = 'stat-bar bg-cyan';
-                            warpValEl.className = 'stat-value text-cyan';
-                        }
-                    }
-                },
-                playSound: () => soundSynth.playHover(),
-                playError: () => soundSynth.playError()
-            });
-        });
-    }
-    
-    const updateScanlineMask = () => {
-        const scanlines = document.querySelector('.hud-scanlines');
-        if (!scanlines) return;
-        
-        const avatar = document.querySelector('.avatar-container');
-        if (avatar && avatar.offsetParent !== null) {
-            const rect = avatar.getBoundingClientRect();
-            const x = rect.left + rect.width / 2;
-            const y = rect.top + rect.height / 2;
-            const r = rect.width / 2 + 1; // 1px margin to prevent grid borders from showing
-            const mask = `radial-gradient(circle at ${x}px ${y}px, transparent ${r}px, black ${r}px)`;
-            scanlines.style.maskImage = mask;
-            scanlines.style.webkitMaskImage = mask;
-        } else {
-            scanlines.style.maskImage = 'none';
-            scanlines.style.webkitMaskImage = 'none';
-        }
-    };
-
-    window.addEventListener('resize', updateScanlineMask);
-
-    const navButtons = document.querySelectorAll('.nav-btn');
-    const views = document.querySelectorAll('.hud-view');
-    
-    navButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            if (btn.classList.contains('active')) return;
-            
-            soundSynth.playClick();
-            
-            const targetId = btn.getAttribute('data-target');
-            
-            navButtons.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            
-            views.forEach(v => v.classList.remove('active'));
-            const targetView = document.getElementById(`view-${targetId}`);
-            if (targetView) {
-                targetView.classList.add('active');
-                
-                // Dynamically update the mask on tab change
-                setTimeout(updateScanlineMask, 50);
-                
-                if (targetId === 'home') {
-                    if (hudController) {
-                        hudController.triggerTypewriter('hero-typewriter', bioTransmission, 15);
-                    }
-                } else if (targetId === 'about') {
-                    const activeContent = document.querySelector('.skills-tab-content.active');
-                    if (activeContent) {
-                        const progressBars = activeContent.querySelectorAll('.progress-fill');
-                        progressBars.forEach(bar => {
-                            const w = bar.style.width;
-                            bar.style.width = '0%';
-                            setTimeout(() => { bar.style.width = w; }, 100);
-                        });
-                    }
-                } else if (targetId === 'terminal') {
-                    const cliInput = document.getElementById('terminal-cli-input');
-                    if (cliInput) setTimeout(() => cliInput.focus(), 200);
-                }
-            }
-        });
-        
-        btn.addEventListener('mouseenter', () => soundSynth.playHover());
+  /* ---------- Bind simple profile fields ---------- */
+  function bindProfile() {
+    const p = D.profile;
+    $$("[data-bind]").forEach((el) => {
+      const v = p[el.dataset.bind];
+      if (v != null) el.textContent = v;
     });
-    
-    const soundToggle = document.getElementById('sound-toggle');
-    const ambientToggle = document.getElementById('ambient-toggle');
-    
-    if (soundToggle) {
-        soundToggle.addEventListener('click', () => {
-            const isMuted = soundSynth.toggleMute();
-            const onIcon = soundToggle.querySelector('.audio-icon.on');
-            const offIcon = soundToggle.querySelector('.audio-icon.off');
-            
-            if (isMuted) {
-                soundToggle.classList.remove('sound-on');
-                onIcon.classList.add('hidden');
-                offIcon.classList.remove('hidden');
-            } else {
-                soundToggle.classList.add('sound-on');
-                onIcon.classList.remove('hidden');
-                offIcon.classList.add('hidden');
-                soundSynth.playClick();
-            }
+    const hrefs = { github: p.github, linkedin: p.linkedin, mailto: `mailto:${p.email}` };
+    $$("[data-href]").forEach((el) => (el.href = hrefs[el.dataset.href]));
+    $("#year").textContent = new Date().getFullYear();
+  }
+
+  /* ---------- Render sections ---------- */
+  function renderStats() {
+    $("#stats").innerHTML = D.stats
+      .map(
+        (s, i) => `<li class="reveal" style="--d:${i * 0.08}s">
+          <span class="stat-num" data-count="${s.value}" data-decimals="${s.decimals || 0}" data-prefix="${s.prefix || ""}" data-suffix="${s.suffix || ""}">${s.prefix || ""}${s.value}${s.suffix || ""}</span>
+          <span class="stat-label">${esc(s.label)}</span></li>`
+      )
+      .join("");
+  }
+
+  function renderMarquee() {
+    const all = [...new Set(D.skills.flatMap((g) => g.items))];
+    const row = all.map((t) => `<span>${esc(t)}</span>`).join("");
+    $("#marquee").innerHTML = row + row;
+  }
+
+  function renderAbout() {
+    $("#about-text").innerHTML = D.about.map((p) => `<p>${esc(p)}</p>`).join("");
+    $("#now-list").innerHTML = D.now.map((n) => `<li>${esc(n)}</li>`).join("");
+    $("#education").innerHTML = D.education
+      .map(
+        (e) => `<li>
+          <span class="tl-period">${esc(e.period)}</span>
+          <div class="tl-title">${esc(e.title)}</div>
+          <div class="tl-place">${esc(e.place)}</div>
+          <ul class="tl-points">${e.points.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>
+        </li>`
+      )
+      .join("");
+  }
+
+  const tags = (arr, n = arr.length) =>
+    `<div class="tags">${arr.slice(0, n).map((t) => `<span class="tag">${esc(t)}</span>`).join("")}${arr.length > n ? `<span class="tag">+${arr.length - n}</span>` : ""}</div>`;
+  const metrics = (m = []) =>
+    m.length ? `<div class="metrics">${m.map((x) => `<div class="metric"><b>${esc(x.k)}</b><small>${esc(x.v)}</small></div>`).join("")}</div>` : "";
+
+  function renderProjects() {
+    const feat = D.projects.filter((p) => p.featured);
+    const rest = D.projects.filter((p) => !p.featured);
+
+    $("#featured").innerHTML = feat
+      .map(
+        (p, i) => `<button class="feat spot reveal" style="--c:${p.accent};--d:${(i % 2) * 0.08}s" data-project="${p.id}" aria-label="Open ${esc(p.name)} details">
+          <div class="feat-bg"></div><div class="feat-grid"></div>
+          <div class="feat-top">
+            <div><span class="kicker">${esc(p.kicker)} · ${esc(p.year)}</span><h3>${esc(p.name)}</h3></div>
+            <span class="feat-icon">${icon(PROJECT_ICON[p.id])}</span>
+          </div>
+          <p>${esc(p.summary)}</p>
+          ${metrics(p.metrics)}
+          <div class="feat-foot">${tags(p.stack, i === 0 ? 7 : 4)}<span class="open-hint">Case study ${icon("arrow")}</span></div>
+        </button>`
+      )
+      .join("");
+
+    $("#project-grid").innerHTML = rest
+      .map(
+        (p) => `<button class="pcard spot reveal" style="--c:${p.accent}" data-project="${p.id}" data-cat="${p.category.join(" ")}" aria-label="Open ${esc(p.name)} details">
+          <div class="row"><span class="bar"></span><span class="year">${esc(p.year)}</span></div>
+          <div><span class="kicker">${esc(p.kicker)}</span><h4>${esc(p.name)}</h4></div>
+          <p>${esc(p.summary)}</p>
+          <div class="row">${tags(p.stack, 3)}<span class="open-hint">${icon("arrow")}</span></div>
+        </button>`
+      )
+      .join("");
+  }
+
+  function renderAchievements() {
+    $("#ach-list").innerHTML = D.achievements
+      .map(
+        (a, i) => `<li class="ach spot reveal" data-type="${a.type}" style="--d:${Math.min(i, 4) * 0.06}s">
+          <span class="ach-ico" aria-hidden="true">${ACH_ICON[a.type] || "⭐"}</span>
+          <div><span class="ach-date">${esc(a.date)}</span><h4>${esc(a.title)}</h4><p>${esc(a.body)}</p></div>
+          <span class="badge">${esc(a.badge)}</span>
+        </li>`
+      )
+      .join("");
+  }
+
+  function renderSkills() {
+    $("#skills-grid").innerHTML = D.skills
+      .map(
+        (g, i) => `<div class="skill-card spot reveal" style="--d:${(i % 4) * 0.06}s">
+          <div class="skill-head"><span class="feat-icon">${icon(g.icon)}</span><h4>${esc(g.group)}</h4></div>
+          <div class="skill-items">${g.items.map((s) => `<span>${esc(s)}</span>`).join("")}</div>
+        </div>`
+      )
+      .join("");
+  }
+
+  /* ---------- Project filter ---------- */
+  function initFilters() {
+    const chips = $$("#filters .chip");
+    chips.forEach((c) =>
+      c.addEventListener("click", () => {
+        chips.forEach((x) => {
+          x.classList.toggle("active", x === c);
+          x.setAttribute("aria-selected", x === c);
         });
+        const f = c.dataset.filter;
+        $$(".pcard").forEach((card) => {
+          const show = f === "all" || card.dataset.cat.split(" ").includes(f);
+          card.classList.toggle("hide", !show);
+          card.classList.remove("enter");
+          if (show) {
+            void card.offsetWidth;
+            card.classList.add("enter", "in");
+          }
+        });
+      })
+    );
+  }
+
+  /* ---------- Project drawer ---------- */
+  let lastFocus = null;
+  function openProject(id) {
+    const p = D.projects.find((x) => x.id === id);
+    if (!p) return;
+    lastFocus = document.activeElement;
+    $("#drawer-body").innerHTML = `
+      <div class="drawer-hero" style="--c:${p.accent}">
+        <span class="kicker" style="--c:${p.accent}">${esc(p.kicker)} · ${esc(p.year)}</span>
+        <h2 id="drawer-title">${esc(p.name)}</h2>
+        <p>${esc(p.summary)}</p>
+      </div>
+      ${p.metrics ? `<h5>Key numbers</h5>${metrics(p.metrics)}` : ""}
+      <h5>What I built</h5>
+      <ul class="hl-list" style="--c:${p.accent}">${p.highlights.map((h) => `<li>${esc(h)}</li>`).join("")}</ul>
+      <h5>Stack</h5>
+      ${tags(p.stack)}
+      <div class="drawer-actions">
+        ${p.live ? `<a class="btn btn-primary" href="${esc(p.live)}" target="_blank" rel="noopener">Live demo ${icon("ext")}</a>` : ""}
+        ${p.repo ? `<a class="btn btn-ghost" href="${esc(p.repo)}" target="_blank" rel="noopener">${icon("github")} Source</a>` : ""}
+      </div>`;
+    $("#drawer").hidden = false;
+    $("#drawer-backdrop").hidden = false;
+    document.body.style.overflow = "hidden";
+    $("#drawer").scrollTop = 0;
+    $("#drawer-close").focus();
+    history.replaceState(null, "", `#project/${p.id}`);
+  }
+  function closeProject() {
+    if ($("#drawer").hidden) return;
+    $("#drawer").hidden = true;
+    $("#drawer-backdrop").hidden = true;
+    document.body.style.overflow = "";
+    history.replaceState(null, "", location.pathname + location.search);
+    lastFocus && lastFocus.focus();
+  }
+  function initDrawer() {
+    document.addEventListener("click", (e) => {
+      const card = e.target.closest("[data-project]");
+      if (card) openProject(card.dataset.project);
+    });
+    $("#drawer-close").addEventListener("click", closeProject);
+    $("#drawer-backdrop").addEventListener("click", closeProject);
+    // focus trap
+    $("#drawer").addEventListener("keydown", (e) => {
+      if (e.key !== "Tab") return;
+      const f = $$("a, button", $("#drawer"));
+      const first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    });
+    const m = location.hash.match(/^#project\/(.+)$/);
+    if (m) setTimeout(() => openProject(m[1]), 300);
+  }
+
+  /* ---------- Command palette ---------- */
+  function initPalette() {
+    const wrap = $("#palette"), input = $("#palette-input"), list = $("#palette-list");
+    const go = (id) => () => document.getElementById(id).scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" });
+    const cmds = [
+      { g: "Navigate", label: "Home", ico: "hash", run: go("top") },
+      { g: "Navigate", label: "About & education", ico: "hash", run: go("about") },
+      { g: "Navigate", label: "Projects", ico: "hash", run: go("projects") },
+      { g: "Navigate", label: "Achievements", ico: "hash", run: go("achievements") },
+      { g: "Navigate", label: "Skills", ico: "hash", run: go("skills") },
+      { g: "Navigate", label: "Contact", ico: "hash", run: go("contact") },
+      ...D.projects.map((p) => ({ g: "Projects", label: p.name, hint: p.kicker, ico: PROJECT_ICON[p.id] || "code", run: () => openProject(p.id) })),
+      { g: "Actions", label: "Copy email address", ico: "copy", run: copyEmail },
+      { g: "Actions", label: "Toggle light / dark theme", ico: "sun", run: toggleTheme },
+      { g: "Links", label: "GitHub", hint: D.profile.githubHandle, ico: "github", run: () => window.open(D.profile.github, "_blank", "noopener") },
+      { g: "Links", label: "LinkedIn", ico: "ext", run: () => window.open(D.profile.linkedin, "_blank", "noopener") },
+      { g: "Links", label: "Send an email", ico: "mail", run: () => (location.href = `mailto:${D.profile.email}`) },
+    ];
+    let shown = [], sel = 0;
+
+    function draw() {
+      const q = input.value.trim().toLowerCase();
+      shown = cmds.filter((c) => !q || (c.label + " " + (c.hint || "") + " " + c.g).toLowerCase().includes(q));
+      sel = Math.min(sel, Math.max(shown.length - 1, 0));
+      if (!shown.length) { list.innerHTML = `<li class="pal-empty">No results for “${esc(q)}”</li>`; return; }
+      let html = "", group = "";
+      shown.forEach((c, i) => {
+        if (c.g !== group) { group = c.g; html += `<li class="pal-group" role="presentation">${group}</li>`; }
+        html += `<li class="pal-item${i === sel ? " sel" : ""}" role="option" aria-selected="${i === sel}" data-i="${i}">
+          <span class="pi">${icon(c.ico)}</span>${esc(c.label)}${c.hint ? `<small>${esc(c.hint)}</small>` : ""}</li>`;
+      });
+      list.innerHTML = html;
+      const s = $(".pal-item.sel", list);
+      s && s.scrollIntoView({ block: "nearest" });
     }
-    
-    if (ambientToggle) {
-        ambientToggle.addEventListener('click', () => {
-            const isHumming = soundSynth.toggleAmbientHum();
-            if (isHumming) {
-                ambientToggle.classList.add('active');
-                soundSynth.playClick();
-            } else {
-                ambientToggle.classList.remove('active');
-            }
-        });
+    function open() { wrap.hidden = false; input.value = ""; sel = 0; draw(); input.focus(); document.body.style.overflow = "hidden"; }
+    function close() { wrap.hidden = true; document.body.style.overflow = ""; }
+    function run(i) { const c = shown[i]; if (!c) return; close(); setTimeout(c.run, 60); }
+
+    $("#open-palette").addEventListener("click", open);
+    input.addEventListener("input", () => { sel = 0; draw(); });
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowDown") { e.preventDefault(); sel = (sel + 1) % shown.length; draw(); }
+      else if (e.key === "ArrowUp") { e.preventDefault(); sel = (sel - 1 + shown.length) % shown.length; draw(); }
+      else if (e.key === "Enter") { e.preventDefault(); run(sel); }
+    });
+    list.addEventListener("click", (e) => { const it = e.target.closest(".pal-item"); if (it) run(+it.dataset.i); });
+    list.addEventListener("mousemove", (e) => {
+      const it = e.target.closest(".pal-item");
+      if (it && +it.dataset.i !== sel) { sel = +it.dataset.i; $$(".pal-item", list).forEach((x) => x.classList.toggle("sel", +x.dataset.i === sel)); }
+    });
+    wrap.addEventListener("click", (e) => { if (e.target === wrap) close(); });
+
+    document.addEventListener("keydown", (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") { e.preventDefault(); wrap.hidden ? open() : close(); }
+      else if (e.key === "/" && wrap.hidden && !/input|textarea/i.test(document.activeElement.tagName)) { e.preventDefault(); open(); }
+      else if (e.key === "Escape") { if (!wrap.hidden) close(); else closeProject(); }
+    });
+  }
+
+  /* ---------- Theme ---------- */
+  function toggleTheme() {
+    const next = document.documentElement.getAttribute("data-theme") === "light" ? "dark" : "light";
+    document.documentElement.setAttribute("data-theme", next);
+    try { localStorage.setItem("theme", next); } catch (e) {}
+    $('meta[name="theme-color"]').setAttribute("content", next === "light" ? "#f7f7fb" : "#0a0a0f");
+  }
+
+  /* ---------- Email copy + toast ---------- */
+  let toastT;
+  function toast(msg) {
+    const t = $("#toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(toastT);
+    toastT = setTimeout(() => t.classList.remove("show"), 2200);
+  }
+  async function copyEmail() {
+    try {
+      await navigator.clipboard.writeText(D.profile.email);
+      toast("Email copied to clipboard");
+      const s = $(".copy-state"); s.textContent = "Copied ✓";
+      setTimeout(() => (s.textContent = "Copy"), 2000);
+    } catch (e) {
+      location.href = `mailto:${D.profile.email}`;
     }
-    
-    const setupInteractivity = () => {
-        const hoverables = document.querySelectorAll('a, button, .project-card, .achievement-card');
-        hoverables.forEach(item => {
-            if (item.id === 'boot-btn' || item.classList.contains('boot-btn')) return;
-            
-            item.addEventListener('mouseenter', () => {
-                soundSynth.playHover();
-            });
+  }
+
+  /* ---------- Contact form (FormSubmit, mailto fallback) ---------- */
+  function initForm() {
+    const form = $("#contact-form"), status = $("#form-status"), btn = $("#cf-submit"), label = $(".btn-label", btn);
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      let ok = true;
+      ["cf-name", "cf-email", "cf-msg"].forEach((id) => {
+        const el = $("#" + id);
+        const bad = !el.value.trim() || (el.type === "email" && !/^\S+@\S+\.\S+$/.test(el.value));
+        el.parentElement.classList.toggle("invalid", bad);
+        if (bad) ok = false;
+      });
+      if (!ok) { status.className = "form-status err"; status.textContent = "Please fill in every field with a valid email."; return; }
+      if (form._honey.value) return;
+
+      const name = $("#cf-name").value.trim(), email = $("#cf-email").value.trim(), message = $("#cf-msg").value.trim();
+      btn.disabled = true; label.textContent = "Sending…"; status.className = "form-status"; status.textContent = "";
+      try {
+        const res = await fetch(`https://formsubmit.co/ajax/${D.profile.email}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify({ name, email, message, _subject: `Portfolio message from ${name}`, _template: "table" }),
         });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || data.success === "false" || data.success === false) throw new Error(data.message || "Failed");
+        form.reset();
+        status.className = "form-status ok";
+        status.textContent = "Thanks! Your message is on its way. I'll reply soon.";
+      } catch (err) {
+        status.className = "form-status err";
+        status.textContent = "Couldn't send from here, so I've opened your email app instead.";
+        location.href = `mailto:${D.profile.email}?subject=${encodeURIComponent("Portfolio message from " + name)}&body=${encodeURIComponent(message + "\n\n— " + name + " (" + email + ")")}`;
+      } finally {
+        btn.disabled = false; label.textContent = "Send message";
+      }
+    });
+  }
+
+  /* ---------- Typed roles ---------- */
+  function initTyped() {
+    const el = $("#typed");
+    const words = D.profile.typed;
+    if (reduceMotion) { el.textContent = words[0]; return; }
+    let w = 0, c = 0, del = false;
+    (function tick() {
+      const word = words[w];
+      el.textContent = word.slice(0, c);
+      if (!del && c === word.length) { del = true; return setTimeout(tick, 1800); }
+      if (del && c === 0) { del = false; w = (w + 1) % words.length; }
+      c += del ? -1 : 1;
+      setTimeout(tick, del ? 35 : 70);
+    })();
+  }
+
+  /* ---------- Count-up ---------- */
+  function countUp(el) {
+    const end = parseFloat(el.dataset.count), dec = +el.dataset.decimals || 0;
+    const pre = el.dataset.prefix || "", suf = el.dataset.suffix || "";
+    if (reduceMotion) return;
+    const t0 = performance.now(), dur = 1400;
+    (function step(t) {
+      const k = Math.min((t - t0) / dur, 1), e = 1 - Math.pow(1 - k, 4);
+      el.textContent = pre + (end * e).toFixed(dec) + suf;
+      if (k < 1) requestAnimationFrame(step);
+    })(t0);
+  }
+
+  /* ---------- Reveal on scroll ---------- */
+  function initReveal() {
+    const io = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((en) => {
+          if (!en.isIntersecting) return;
+          en.target.classList.add("in");
+          $$("[data-count]", en.target).forEach(countUp);
+          if (en.target.matches("[data-count]")) countUp(en.target);
+          io.unobserve(en.target);
+        }),
+      { threshold: 0.12, rootMargin: "0px 0px -40px 0px" }
+    );
+    $$(".reveal, .big-stat").forEach((el) => io.observe(el));
+  }
+
+  /* ---------- Nav: active section, indicator, scroll state ---------- */
+  function initNav() {
+    const nav = $("#nav"), links = $$(".nav-links a"), ind = $(".nav-indicator"), bar = $(".scroll-progress");
+    const moveInd = (a) => {
+      if (!a) { ind.style.opacity = 0; return; }
+      ind.style.opacity = 1; ind.style.left = a.offsetLeft + "px"; ind.style.width = a.offsetWidth + "px";
     };
-    
-    setTimeout(setupInteractivity, 2000);
-});
+    const sections = links.map((a) => document.querySelector(a.getAttribute("href")));
+    let ticking = false;
+    function onScroll() {
+      const y = scrollY, h = document.documentElement.scrollHeight - innerHeight;
+      bar.style.transform = `scaleX(${h > 0 ? y / h : 0})`;
+      nav.classList.toggle("scrolled", y > 20);
+      let cur = null;
+      sections.forEach((s, i) => { if (s && s.getBoundingClientRect().top < innerHeight * 0.4) cur = links[i]; });
+      links.forEach((a) => a.classList.toggle("active", a === cur));
+      moveInd(cur);
+      ticking = false;
+    }
+    addEventListener("scroll", () => { if (!ticking) { requestAnimationFrame(onScroll); ticking = true; } }, { passive: true });
+    addEventListener("resize", onScroll);
+    onScroll();
+
+    const btn = $("#menu-btn"), menu = $("#mobile-menu");
+    btn.addEventListener("click", () => {
+      const open = menu.hidden;
+      menu.hidden = !open;
+      btn.setAttribute("aria-expanded", open);
+    });
+    $$("a", menu).forEach((a) => a.addEventListener("click", () => { menu.hidden = true; btn.setAttribute("aria-expanded", false); }));
+  }
+
+  /* ---------- Pointer effects: spotlight, tilt, magnetic ---------- */
+  function initPointer() {
+    if (!finePointer) return;
+    document.addEventListener("pointermove", (e) => {
+      const card = e.target.closest(".spot");
+      if (!card) return;
+      const r = card.getBoundingClientRect();
+      card.style.setProperty("--mx", e.clientX - r.left + "px");
+      card.style.setProperty("--my", e.clientY - r.top + "px");
+    }, { passive: true });
+
+    if (reduceMotion) return;
+    const p = $("#portrait");
+    p.addEventListener("pointermove", (e) => {
+      const r = p.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+      p.style.transform = `perspective(900px) rotateY(${(x - 0.5) * 12}deg) rotateX(${(0.5 - y) * 12}deg) scale(1.02)`;
+      p.style.setProperty("--gx", x * 100 + "%");
+      p.style.setProperty("--gy", y * 100 + "%");
+    });
+    p.addEventListener("pointerleave", () => (p.style.transform = ""));
+
+    $$(".magnetic").forEach((b) => {
+      b.addEventListener("pointermove", (e) => {
+        const r = b.getBoundingClientRect();
+        b.style.transform = `translate(${(e.clientX - r.left - r.width / 2) * 0.18}px, ${(e.clientY - r.top - r.height / 2) * 0.3}px)`;
+      });
+      b.addEventListener("pointerleave", () => (b.style.transform = ""));
+    });
+  }
+
+  /* ---------- Hero particle constellation ---------- */
+  function initCanvas() {
+    const cv = $("#hero-canvas");
+    const ctx = cv.getContext("2d");
+    let w, h, dpr, pts = [], mouse = { x: -9999, y: -9999 }, raf, visible = true;
+    const rgb = () => getComputedStyle(document.documentElement).getPropertyValue("--particle").trim() || "180,170,255";
+    let color = rgb();
+
+    function size() {
+      dpr = Math.min(devicePixelRatio || 1, 2);
+      w = cv.offsetWidth; h = cv.offsetHeight;
+      cv.width = w * dpr; cv.height = h * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const n = Math.round(Math.min(110, (w * h) / 14000));
+      pts = Array.from({ length: n }, () => ({
+        x: Math.random() * w, y: Math.random() * h,
+        vx: (Math.random() - 0.5) * 0.25, vy: (Math.random() - 0.5) * 0.25, r: Math.random() * 1.4 + 0.4,
+      }));
+    }
+    function frame() {
+      ctx.clearRect(0, 0, w, h);
+      const LINK = 130;
+      for (let i = 0; i < pts.length; i++) {
+        const p = pts[i];
+        const dx = p.x - mouse.x, dy = p.y - mouse.y, d2 = dx * dx + dy * dy;
+        if (d2 < 22000) { const f = (1 - d2 / 22000) * 0.6; p.x += (dx / Math.sqrt(d2 + 1)) * f; p.y += (dy / Math.sqrt(d2 + 1)) * f; }
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < 0 || p.x > w) p.vx *= -1;
+        if (p.y < 0 || p.y > h) p.vy *= -1;
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 6.283);
+        ctx.fillStyle = `rgba(${color},.55)`; ctx.fill();
+        for (let j = i + 1; j < pts.length; j++) {
+          const q = pts[j], ex = p.x - q.x, ey = p.y - q.y, e2 = ex * ex + ey * ey;
+          if (e2 < LINK * LINK) {
+            ctx.strokeStyle = `rgba(${color},${(1 - Math.sqrt(e2) / LINK) * 0.16})`;
+            ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y); ctx.stroke();
+          }
+        }
+      }
+      raf = visible ? requestAnimationFrame(frame) : null;
+    }
+    size();
+    if (reduceMotion) { frame(); cancelAnimationFrame(raf); return; }
+    frame();
+    addEventListener("resize", () => { clearTimeout(cv._t); cv._t = setTimeout(size, 150); });
+    $(".hero").addEventListener("pointermove", (e) => { const r = cv.getBoundingClientRect(); mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top; });
+    $(".hero").addEventListener("pointerleave", () => (mouse.x = mouse.y = -9999));
+    new IntersectionObserver(([en]) => { visible = en.isIntersecting; if (visible && !raf) frame(); }).observe(cv);
+    new MutationObserver(() => (color = rgb())).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  }
+
+  /* ---------- Boot ---------- */
+  bindProfile();
+  renderStats();
+  renderMarquee();
+  renderAbout();
+  renderProjects();
+  renderAchievements();
+  renderSkills();
+  initFilters();
+  initDrawer();
+  initPalette();
+  initForm();
+  initTyped();
+  initReveal();
+  initNav();
+  initPointer();
+  initCanvas();
+  $("#theme-toggle").addEventListener("click", toggleTheme);
+  $("#email-copy").addEventListener("click", copyEmail);
+})();
