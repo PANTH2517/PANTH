@@ -1,334 +1,232 @@
-<!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<!doctype html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Panth Haveliwala · AI & Full-Stack Engineer</title>
-  <meta name="description" content="Panth Haveliwala: B.Tech Computer Engineering student at NMIMS Shirpur (Rank 1, CGPA 8.75). Builds AI systems and secure full-stack products such as NyayaVault, Veritas AI, StartIn and Guardian AI. 15+ hackathons.">
-  <meta name="author" content="Panth Haveliwala">
-  <meta name="theme-color" content="#0a0a0f">
-
-  <!-- Open Graph / social preview -->
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="Panth Haveliwala · AI & Full-Stack Engineer">
-  <meta property="og:description" content="AI systems, deepfake forensics and secure full-stack products. Batch rank #1 · 15+ hackathons.">
-  <meta property="og:image" content="assets/avatar.jpg">
-  <meta name="twitter:card" content="summary">
-
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Panth Haveliwala · PH-1 Station</title>
+  <meta name="description" content="Tour the PH-1 space station: Panth Haveliwala's portfolio. AI and full-stack engineer, batch rank #1 at NMIMS Shirpur, 15+ hackathons and 3 wins.">
+  <meta name="theme-color" content="#03040a">
+  <meta property="og:title" content="Panth Haveliwala · PH-1 Station">
+  <meta property="og:description" content="Scroll to board the station. Every module holds part of my work.">
+  <meta property="og:image" content="assets/profile.jpg">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="assets/avatar.jpg">
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
-
-  <!-- Apply saved theme before paint (no flash) -->
-  <script>
-    try {
-      var t = localStorage.getItem('theme');
-      if (!t) t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
-      document.documentElement.setAttribute('data-theme', t);
-    } catch (e) {}
-  </script>
-
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Person",
-    "name": "Panth Haveliwala",
-    "jobTitle": "AI & Full-Stack Engineer",
-    "alumniOf": "SVKM's NMIMS, MPSTME Shirpur",
-    "address": { "@type": "PostalAddress", "addressLocality": "Valsad", "addressRegion": "Gujarat", "addressCountry": "IN" },
-    "sameAs": ["https://github.com/PANTH2517", "https://www.linkedin.com/in/panth-haveliwala-06811131a"]
-  }
-  </script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Barlow+Condensed:wght@500;600;700;800&display=swap">
+  <link rel="stylesheet" href="css/station.css">
+  <script type="importmap">{ "imports": { "three": "./assets/vendor/three.module.min.js" } }</script>
 </head>
+<body class="is-loading">
+  <a class="skip" href="#crew">Skip to the crew profile</a>
+  <canvas id="gl" aria-hidden="true"></canvas>
+  <div class="flash" id="flash" aria-hidden="true"></div>
+  <svg class="leaders" id="leaders" aria-hidden="true"><path id="leader-path"/><circle id="leader-ring" r="9"/><circle id="leader-dot" r="4"/></svg>
 
-<body>
-  <a class="skip-link" href="#main">Skip to content</a>
-  <div class="scroll-progress" aria-hidden="true"></div>
-
-  <!-- ============ NAV ============ -->
-  <header class="nav" id="nav">
-    <a href="#top" class="nav-logo" aria-label="Home">
-      <span class="logo-mark">PH</span>
-    </a>
-    <nav class="nav-links" aria-label="Primary">
-      <a href="#about">About</a>
-      <a href="#projects">Work</a>
-      <a href="#achievements">Achievements</a>
-      <a href="#skills">Skills</a>
-      <a href="#contact">Contact</a>
-      <span class="nav-indicator" aria-hidden="true"></span>
-    </nav>
-    <div class="nav-actions">
-      <button class="kbd-btn" id="open-palette" aria-label="Open command menu">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        <span class="kbd-hint"><kbd>⌘</kbd><kbd>K</kbd></span>
-      </button>
-      <button class="icon-btn" id="theme-toggle" aria-label="Toggle colour theme">
-        <svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
-        <svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
-      </button>
-      <button class="icon-btn menu-btn" id="menu-btn" aria-label="Open menu" aria-expanded="false">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
-      </button>
+  <!-- ============ LAUNCH SEQUENCE ============ -->
+  <div class="loader" id="loader" aria-hidden="true">
+    <canvas class="loader-fx" id="loader-fx"></canvas>
+    <div class="loader-top">
+      <span>PH-1 STATION <i class="ld-blink"></i></span>
+      <span class="ld-coord">LAUNCH SITE 20.5937°N 72.9342°E · VALSAD, IN<br><b id="ld-clock">UTC 00:00:00</b></span>
     </div>
-  </header>
-
-  <div class="mobile-menu" id="mobile-menu" hidden>
-    <a href="#about">About</a>
-    <a href="#projects">Work</a>
-    <a href="#achievements">Achievements</a>
-    <a href="#skills">Skills</a>
-    <a href="#contact">Contact</a>
+    <div class="loader-core">
+      <div class="ld-rings"><i></i><i></i><i></i></div>
+      <div class="ld-kicker">RENDEZVOUS WITH PH-1 · LOW EARTH ORBIT · 408 KM</div>
+      <div class="loader-name" id="loader-name"><span class="ln-w">PANTH</span><span class="ln-w">HAVELIWALA</span></div>
+      <div class="ld-count3" id="ld-count3"></div>
+    </div>
+    <div class="loader-bottom">
+      <div class="ld-log" id="ld-log"></div>
+      <div class="ld-right">
+        <span class="loader-status" id="loader-status">BOOT SEQUENCE</span>
+        <span class="loader-count"><span id="loader-num">000</span><small>%</small></span>
+      </div>
+    </div>
+    <div class="loader-bar"><span id="loader-bar"></span></div>
+    <div class="ld-flash" id="ld-flash"></div>
   </div>
 
-  <main id="main">
-    <!-- ============ HERO ============ -->
-    <section class="hero" id="top">
-      <canvas id="hero-canvas" aria-hidden="true"></canvas>
-      <div class="hero-glow" aria-hidden="true"></div>
+  <!-- ============ HUD ============ -->
+  <header class="hud">
+    <a class="brand" href="#top" data-go="0" aria-label="Back to the start"><b>PH-1</b><span>Panth Haveliwala</span></a>
+    <nav class="modules" aria-label="Station modules">
+      <a href="#top" data-go="0">Station</a>
+      <a href="#crew" data-go="4">Crew</a>
+      <a href="#lab" data-go="5">Lab</a>
+      <a href="#patches" data-go="11">Patches</a>
+      <a href="#stowage" data-go="12">Cargo</a>
+      <a href="#cupola" data-go="14">Cupola</a>
+      <a href="#comms" data-go="15">Comms</a>
+    </nav>
+    <button class="menu-btn" id="menu-btn" type="button" aria-expanded="false" aria-controls="menu">Modules</button>
+  </header>
+  <nav class="menu" id="menu" hidden aria-label="Station modules">
+    <a href="#top" data-go="0">Station</a><a href="#crew" data-go="4">Crew quarters</a><a href="#lab" data-go="5">Lab</a><a href="#patches" data-go="11">Patch wall</a><a href="#stowage" data-go="12">Cargo</a><a href="#tools" data-go="13">Robotics</a><a href="#cupola" data-go="14">Cupola</a><a href="#comms" data-go="15">Comms</a>
+  </nav>
 
-      <div class="container hero-grid">
-        <div class="hero-copy">
-          <p class="eyebrow reveal">
-            <span class="dot"></span>
-            B.Tech CE @ NMIMS Shirpur · Batch Rank #1
-          </p>
-          <h1 class="hero-title reveal">
-            <span class="line">Hi, I'm <span class="grad" data-bind="firstName">Panth</span>.</span>
-            <span class="line muted-line">I build <span class="typed" id="typed" aria-live="polite"></span><span class="caret" aria-hidden="true"></span></span>
-          </h1>
-          <p class="hero-sub reveal" data-bind="tagline"></p>
-          <div class="hero-cta reveal">
-            <a href="#projects" class="btn btn-primary magnetic">
-              View my work
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-            </a>
-            <a href="#contact" class="btn btn-ghost magnetic">Get in touch</a>
-            <div class="hero-socials">
-              <a class="icon-btn" data-href="github" target="_blank" rel="noopener" aria-label="GitHub">
-                <svg viewBox="0 0 24 24" class="fill" aria-hidden="true"><path d="M12 .5a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2.2c-3.3.7-4-1.4-4-1.4-.6-1.4-1.3-1.8-1.3-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.7 18.3 5 18.3 5c.7 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .5z"/></svg>
-              </a>
-              <a class="icon-btn" data-href="linkedin" target="_blank" rel="noopener" aria-label="LinkedIn">
-                <svg viewBox="0 0 24 24" class="fill" aria-hidden="true"><path d="M20.4 20.5h-3.6v-5.6c0-1.3 0-3-1.8-3s-2.1 1.4-2.1 2.9v5.7H9.3V9h3.4v1.6h.1c.5-.9 1.6-1.8 3.4-1.8 3.6 0 4.3 2.4 4.3 5.5v6.2zM5.3 7.4a2.1 2.1 0 1 1 0-4.2 2.1 2.1 0 0 1 0 4.2zM7.1 20.5H3.6V9h3.5v11.5zM22.2 0H1.8C.8 0 0 .8 0 1.7v20.6c0 .9.8 1.7 1.8 1.7h20.4c1 0 1.8-.8 1.8-1.7V1.7C24 .8 23.2 0 22.2 0z"/></svg>
-              </a>
-            </div>
-          </div>
+  <ol class="rail" id="rail" aria-label="Tour stops"></ol>
+
+  <div class="readout" aria-live="polite">
+    <span class="ro-mod" id="ro-mod">Exterior</span>
+    <span class="ro-stop" id="ro-stop">Approach</span>
+  </div>
+  <div class="orbit" aria-hidden="true"><span>ALT <b>408</b> km</span><span>VEL <b>7.66</b> km/s</span></div>
+  <p class="scroll-cue" id="scroll-cue">Scroll to fly in</p>
+
+  <!-- ============ THE TOUR ============ -->
+  <main id="tour">
+    <!-- 0 approach -->
+    <section class="stop" data-stop="0" id="top" data-label="Approach" data-mod="Exterior">
+      <i class="stop-mark" data-t="0"></i>
+      <article class="pin pin-hero" data-side="left">
+        <p class="pin-code">PH-1 · LOW EARTH ORBIT</p>
+        <h1 class="hero-name">Panth Haveliwala</h1>
+        <p class="hero-role">AI &amp; full-stack engineer</p>
+        <p class="pin-lead">I build AI that catches deepfakes, systems that prove nobody tampered with them, and products that hold up in production.</p>
+        <div class="pin-actions">
+          <button class="btn btn-solid" type="button" data-go="1">Start the tour</button>
+          <a class="btn" href="mailto:panthhaveliwala@gmail.com">Email me</a>
         </div>
-
-        <div class="hero-visual reveal">
-          <div class="portrait tilt" id="portrait">
-            <img src="assets/profile.jpg" alt="Portrait of Panth Haveliwala" width="640" height="800" fetchpriority="high">
-            <div class="portrait-glare" aria-hidden="true"></div>
-            <div class="portrait-meta">
-              <span class="pm-name" data-bind="name"></span>
-              <span class="pm-loc">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-6.3 7-12a7 7 0 0 0-14 0c0 5.7 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>
-                <span data-bind="location"></span>
-              </span>
-            </div>
-          </div>
-          <div class="float-chip chip-a">
-            <span class="chip-ico">🏆</span>
-            <div><strong>Rank #1</strong><small>Sem 3 &amp; Sem 4</small></div>
-          </div>
-          <div class="float-chip chip-b">
-            <span class="chip-ico">⚡</span>
-            <div><strong>15+ hackathons</strong><small>Team lead · Winner</small></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="container">
-        <ul class="stats" id="stats"></ul>
-      </div>
-
-      <div class="marquee" aria-hidden="true">
-        <div class="marquee-track" id="marquee"></div>
-      </div>
+        <p class="pin-note">This station is my portfolio. Scroll to fly around it, then board.</p>
+      </article>
     </section>
 
-    <!-- ============ ABOUT ============ -->
-    <section class="section" id="about">
-      <div class="container">
-        <header class="section-head reveal">
-          <span class="section-num">01</span>
-          <h2>About</h2>
-          <p class="section-lede">Engineer first, student second. I care about systems that still work when they're attacked or under heavy load.</p>
-        </header>
-
-        <div class="about-grid">
-          <div class="card about-text reveal" id="about-text"></div>
-
-          <div class="card now-card reveal">
-            <div class="card-label"><span class="live-dot"></span> Currently</div>
-            <ul class="now-list" id="now-list"></ul>
-          </div>
-
-          <div class="card edu-card reveal">
-            <div class="card-label">Education</div>
-            <ol class="timeline" id="education"></ol>
-          </div>
-        </div>
-      </div>
+    <!-- 1 solar wing: about -->
+    <section class="stop" data-stop="1" id="about" data-label="Solar array" data-mod="Exterior">
+      <i class="stop-mark" data-t="1"></i>
+      <article class="pin" data-side="left">
+        <p class="pin-code">STARBOARD SOLAR ARRAY 1A · POWER</p>
+        <h2 class="pin-title">What powers me</h2>
+        <p class="pin-lead" data-fill="statement"></p>
+        <dl class="stats" data-fill="stats"></dl>
+      </article>
     </section>
 
-    <!-- ============ PROJECTS ============ -->
-    <section class="section" id="projects">
-      <div class="container">
-        <header class="section-head reveal">
-          <span class="section-num">02</span>
-          <h2>Selected work</h2>
-          <p class="section-lede">Production-grade builds across AI, security, web and mobile. Open any card for the full breakdown.</p>
-        </header>
-
-        <div class="bento" id="featured"></div>
-
-        <div class="more-head reveal">
-          <h3>More projects</h3>
-          <div class="filters" role="tablist" aria-label="Filter projects" id="filters">
-            <button class="chip active" data-filter="all" role="tab" aria-selected="true">All</button>
-            <button class="chip" data-filter="ai" role="tab" aria-selected="false">AI / ML</button>
-            <button class="chip" data-filter="security" role="tab" aria-selected="false">Security</button>
-            <button class="chip" data-filter="web" role="tab" aria-selected="false">Web</button>
-            <button class="chip" data-filter="mobile" role="tab" aria-selected="false">Mobile</button>
-          </div>
-        </div>
-        <div class="project-grid" id="project-grid"></div>
-      </div>
+    <!-- 2 antenna: telemetry -->
+    <section class="stop" data-stop="2" id="telemetry" data-label="Antenna" data-mod="Exterior">
+      <i class="stop-mark" data-t="2"></i>
+      <article class="pin pin-wide" data-side="left">
+        <p class="pin-code">SGANT KU-BAND ANTENNA · LIVE DOWNLINK</p>
+        <h2 class="pin-title">GitHub telemetry</h2>
+        <p class="tele-status" id="tele-status">Acquiring signal…</p>
+        <dl class="tele-stats">
+          <div><dt>Contributions, last 12 months</dt><dd data-k="total">—</dd></div>
+          <div><dt>Days with commits</dt><dd data-k="active">—</dd></div>
+          <div><dt>Longest streak</dt><dd data-k="streak">—</dd></div>
+        </dl>
+        <div class="heat-wrap"><div class="heat" id="heat"></div><div class="heat-tip" id="heat-tip" hidden></div></div>
+        <ul class="shipped" id="shipped-list"></ul>
+      </article>
     </section>
 
-    <!-- ============ ACHIEVEMENTS ============ -->
-    <section class="section" id="achievements">
-      <div class="container">
-        <header class="section-head reveal">
-          <span class="section-num">03</span>
-          <h2>Achievements</h2>
-          <p class="section-lede">Consistent at the top academically, and comfortable building under hackathon pressure.</p>
-        </header>
-
-        <div class="ach-layout">
-          <div class="ach-highlight reveal">
-            <div class="card big-stat">
-              <span class="big-num" data-count="1" data-prefix="#">#1</span>
-              <span class="big-label">Batch rank, two semesters running</span>
-              <div class="gpa-bars" id="gpa-bars">
-                <div class="gpa-bar"><b>9.41</b><i><span style="--h:94.1%"></span></i><small>Sem 3</small></div>
-                <div class="gpa-bar"><b>9.24</b><i><span style="--h:92.4%"></span></i><small>Sem 4</small></div>
-                <div class="gpa-bar cg"><b>8.75</b><i><span style="--h:87.5%"></span></i><small>CGPA</small></div>
-              </div>
-            </div>
-            <div class="card big-stat alt">
-              <span class="big-num" data-count="15" data-suffix="+">15+</span>
-              <span class="big-label">Hackathons competed, mostly as team lead, including a win</span>
-            </div>
-          </div>
-          <ol class="ach-list" id="ach-list"></ol>
-        </div>
-      </div>
+    <!-- 3 docking: now -->
+    <section class="stop" data-stop="3" id="now" data-label="Docking port" data-mod="Exterior">
+      <i class="stop-mark" data-t="3"></i>
+      <article class="pin" data-side="left">
+        <p class="pin-code">IDA-2 DOCKING ADAPTER · ACTIVE MISSIONS</p>
+        <h2 class="pin-title">Right now</h2>
+        <ul class="now-list" data-fill="now"></ul>
+        <p class="pin-note" data-fill="nowUpdated"></p>
+      </article>
     </section>
 
-    <!-- ============ SKILLS ============ -->
-    <section class="section" id="skills">
-      <div class="container">
-        <header class="section-head reveal">
-          <span class="section-num">04</span>
-          <h2>Toolkit</h2>
-          <p class="section-lede">The stack I reach for, all of it used in shipped projects.</p>
-        </header>
-        <div class="skills-grid" id="skills-grid"></div>
-      </div>
+    <!-- 4 crew -->
+    <section class="stop" data-stop="4" id="crew" data-label="Crew quarters" data-mod="Node 2 · Harmony">
+      <i class="stop-mark" data-t="4"></i>
+      <article class="pin" data-side="right">
+        <p class="pin-code">NODE 2 · CREW QUARTERS</p>
+        <h2 class="pin-title">Crew profile</h2>
+        <dl class="facts" data-fill="facts"></dl>
+        <div class="edu" data-fill="education"></div>
+      </article>
     </section>
 
-    <!-- ============ CONTACT ============ -->
-    <section class="section" id="contact">
-      <div class="container">
-        <div class="contact-card card reveal">
-          <div class="contact-copy">
-            <span class="section-num">05</span>
-            <h2>Let's build something.</h2>
-            <p>Internships, hackathon teams, collaborations, or just a good technical conversation. My inbox is open.</p>
+    <!-- 5–10 lab racks: rendered from data.js -->
+    <div id="lab" data-fill="racks"></div>
 
-            <button class="email-copy" id="email-copy" type="button">
-              <span data-bind="email"></span>
-              <span class="copy-state">Copy</span>
-            </button>
+    <!-- 11 patch wall (Node 1) -->
+    <section class="stop" data-stop="11" id="patches" data-label="Patch wall" data-mod="Node 1 · Unity">
+      <i class="stop-mark" data-t="11"></i>
+      <article class="pin" data-side="left">
+        <p class="pin-code">NODE 1 · PATCH WALL</p>
+        <h2 class="pin-title">Patches earned</h2>
+        <ol class="record" data-fill="record"></ol>
+      </article>
+    </section>
 
-            <div class="contact-links">
-              <a data-href="github" target="_blank" rel="noopener" class="link-row">
-                <span>GitHub</span><span class="muted" data-bind="githubHandle"></span><span class="arrow">↗</span>
-              </a>
-              <a data-href="linkedin" target="_blank" rel="noopener" class="link-row">
-                <span>LinkedIn</span><span class="muted" data-bind="linkedinHandle"></span><span class="arrow">↗</span>
-              </a>
-              <a class="link-row" data-href="mailto">
-                <span>Email</span><span class="muted">Direct</span><span class="arrow">↗</span>
-              </a>
-            </div>
-          </div>
+    <!-- 12 stowage (PMM) -->
+    <section class="stop" data-stop="12" id="stowage" data-label="Stowage" data-mod="PMM · Leonardo">
+      <i class="stop-mark" data-t="12"></i>
+      <article class="pin" data-side="right">
+        <p class="pin-code">PMM · STOWAGE MANIFEST</p>
+        <h2 class="pin-title">More projects</h2>
+        <ul class="manifest" data-fill="archive"></ul>
+      </article>
+    </section>
 
-          <form class="contact-form" id="contact-form" novalidate>
-            <div class="field">
-              <input id="cf-name" name="name" type="text" placeholder=" " required autocomplete="name">
-              <label for="cf-name">Your name</label>
-            </div>
-            <div class="field">
-              <input id="cf-email" name="email" type="email" placeholder=" " required autocomplete="email">
-              <label for="cf-email">Email</label>
-            </div>
-            <div class="field">
-              <textarea id="cf-msg" name="message" rows="5" placeholder=" " required></textarea>
-              <label for="cf-msg">Message</label>
-            </div>
-            <!-- honeypot -->
-            <input type="text" name="_honey" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
-            <button type="submit" class="btn btn-primary btn-block" id="cf-submit">
-              <span class="btn-label">Send message</span>
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
-            </button>
-            <p class="form-status" id="form-status" role="status"></p>
-          </form>
-        </div>
-      </div>
+    <!-- 13 robotics -->
+    <section class="stop" data-stop="13" id="tools" data-label="Robotics" data-mod="Cupola">
+      <i class="stop-mark" data-t="13"></i>
+      <article class="pin pin-wide" data-side="right">
+        <p class="pin-code">CUPOLA · ROBOTICS WORKSTATION</p>
+        <h2 class="pin-title">What I can build for you</h2>
+        <div class="services" data-fill="services"></div>
+        <dl class="tools" data-fill="skills"></dl>
+      </article>
+    </section>
+
+    <!-- 14 cupola -->
+    <section class="stop" data-stop="14" id="cupola" data-label="Cupola" data-mod="Cupola">
+      <i class="stop-mark" data-t="14"></i>
+      <article class="pin" data-side="left">
+        <p class="pin-code">CUPOLA · NADIR VIEW</p>
+        <h2 class="pin-title">That’s home down there</h2>
+        <p class="pin-lead">Valsad, Gujarat. Where I grew up and where every one of these builds started.</p>
+        <p class="pin-text">I'm studying Computer Engineering at NMIMS Shirpur until 2028, and I'm open to internships in AI/ML, security engineering and full-stack, remote or on-site.</p>
+        <div class="pin-actions"><a class="btn btn-solid" href="#comms" data-go="15">Send a message</a><a class="btn" href="https://www.linkedin.com/in/panth-haveliwala-06811131a" target="_blank" rel="noopener">LinkedIn</a></div>
+      </article>
+    </section>
+
+    <!-- 15 comms -->
+    <section class="stop" data-stop="15" id="comms" data-label="Comms" data-mod="Cupola">
+      <i class="stop-mark" data-t="15"></i>
+      <article class="pin" data-side="left">
+        <p class="pin-code">COMMS · S-BAND UPLINK</p>
+        <h2 class="pin-title">Send a message</h2>
+        <p class="pin-text">Internships, hackathon teams or a project that needs to be trustworthy. I reply within a day.</p>
+        <form class="cform" id="contact-form" novalidate>
+          <label class="field"><span>Your name</span><input id="cf-name" name="name" autocomplete="name" required></label>
+          <label class="field"><span>Your email</span><input id="cf-email" name="email" type="email" autocomplete="email" required></label>
+          <label class="field"><span>Message</span><textarea id="cf-msg" name="message" rows="3" required></textarea></label>
+          <input type="text" name="_honey" class="honey" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <div class="pin-actions"><button class="btn btn-solid" id="cf-submit" type="submit"><span class="send-label">Send message</span></button><a class="btn" id="mail-big" href="mailto:panthhaveliwala@gmail.com">Copy email address</a></div>
+          <p class="form-status" id="form-status" role="status"></p>
+        </form>
+      </article>
+    </section>
+
+    <!-- 16 undock -->
+    <section class="stop" data-stop="16" id="undock" data-label="Undock" data-mod="Exterior">
+      <i class="stop-mark" data-t="16"></i>
+      <article class="pin pin-end" data-side="center">
+        <p class="pin-code">UNDOCKING · TOUR COMPLETE</p>
+        <h2 class="pin-title">Thanks for coming aboard.</h2>
+        <p class="pin-lead">The station circles Earth every 92 minutes. I'll keep adding modules.</p>
+        <div class="pin-actions"><button class="btn btn-solid" type="button" data-go="0">Fly the tour again</button><a class="btn" href="https://github.com/PANTH2517" target="_blank" rel="noopener">GitHub</a><a class="btn" href="https://www.linkedin.com/in/panth-haveliwala-06811131a" target="_blank" rel="noopener">LinkedIn</a></div>
+      </article>
     </section>
   </main>
 
-  <footer class="footer">
-    <div class="container footer-inner">
-      <span>© <span id="year"></span> Panth Haveliwala</span>
-      <span class="muted">Designed &amp; built from scratch · Valsad, India</span>
-      <a href="#top" class="back-top">Back to top ↑</a>
-    </div>
-  </footer>
-
-  <!-- ============ PROJECT DRAWER ============ -->
-  <div class="drawer-backdrop" id="drawer-backdrop" hidden></div>
-  <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title" hidden>
-    <button class="icon-btn drawer-close" id="drawer-close" aria-label="Close">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
-    </button>
-    <div class="drawer-body" id="drawer-body"></div>
-  </aside>
-
-  <!-- ============ COMMAND PALETTE ============ -->
-  <div class="palette-backdrop" id="palette" hidden>
-    <div class="palette" role="dialog" aria-modal="true" aria-label="Command menu">
-      <div class="palette-input">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        <input id="palette-input" type="text" placeholder="Jump to a section, open a project, copy email…" autocomplete="off" spellcheck="false" aria-controls="palette-list">
-        <kbd>esc</kbd>
-      </div>
-      <ul class="palette-list" id="palette-list" role="listbox"></ul>
-      <div class="palette-foot"><span><kbd>↑</kbd><kbd>↓</kbd> navigate</span><span><kbd>↵</kbd> select</span></div>
-    </div>
+  <!-- case file -->
+  <div class="case" id="case" hidden role="dialog" aria-modal="true" aria-labelledby="case-title">
+    <button class="case-close" id="case-close" type="button">Close</button>
+    <div class="case-inner" id="case-inner"></div>
   </div>
-
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="toast" id="toast" role="status"></div>
 
   <script src="data.js"></script>
-  <script src="script.js"></script>
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script src="assets/vendor/lenis.min.js"></script>
+  <script type="module" src="js/main.js"></script>
 </body>
 </html>

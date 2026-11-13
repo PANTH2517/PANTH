@@ -35,20 +35,63 @@ window.PORTFOLIO = {
   stats: [
     { value: 1, prefix: "#", suffix: "", label: "Batch rank · Sem 3 & Sem 4" },
     { value: 8.75, decimals: 2, suffix: "", label: "Overall CGPA / 10" },
-    { value: 15, suffix: "+", label: "Hackathons competed" },
+    { value: 15, suffix: "+", label: "Hackathons competed · 3 won" },
     { value: 11, suffix: "", label: "Projects shipped" },
   ],
 
-  about: [
-    "I'm a Computer Engineering student at SVKM's NMIMS (MPSTME), Shirpur, and I've topped my batch two semesters in a row. Most of my time goes into building things that would hold up in the real world: AI models deployed behind real APIs, auth flows with MFA and token rotation, and audit trails that can prove they weren't tampered with.",
-    "I've competed in 15+ hackathons, usually as team lead, and won along the way. I like the 36-hour pressure: scope hard, build the core first, demo something that works.",
-    "Right now I'm going deep on deepfake and media forensics, applied cryptography for evidence integrity, and production-grade full-stack architecture.",
+  /* Big scroll-reveal statement in the About section */
+  statement:
+    "I build AI that catches deepfakes, systems that can prove nobody tampered with them, and full-stack products that survive production. Batch rank #1 two semesters in a row. 15+ hackathons, usually as team lead, with 3 wins.",
+
+  /* Small fact rows under the statement */
+  facts: [
+    { k: "Based in", v: "Valsad, Gujarat, India" },
+    { k: "Studying", v: "B.Tech CE · NMIMS MPSTME Shirpur · 2024–28" },
+    { k: "Focus", v: "Media forensics · applied crypto · full-stack" },
+    { k: "Now", v: "Hardening NyayaVault's blockchain anchoring" },
   ],
 
+  /* "Current orbit": what you're doing right now. Update `updated` when you edit this. */
+  nowUpdated: "November 2026",
   now: [
-    "Hardening NyayaVault: blockchain-anchored evidence integrity",
-    "Improving Veritas AI's audio and video deepfake signals",
-    "Semester 5 at NMIMS, aiming to keep rank #1",
+    { title: "Hardening NyayaVault", body: "Anchoring evidence audit checkpoints to a 4-node Proof-of-Authority chain, so Police, Prosecution and Court can each verify the chain of custody.", link: { label: "NyayaVault", url: "https://nyayavault.vercel.app" } },
+    { title: "Teaching Veritas to hear fakes", body: "Extending the deepfake engine from faces to voice clones and video frames with STFT spectrogram signals.", link: { label: "Veritas AI", url: "https://veritas-ai-ashen.vercel.app" } },
+    { title: "Semester 5 at NMIMS", body: "Ranked #1 in the CE batch in Sem 3 and Sem 4. Going for three in a row." },
+    { title: "Next hackathon", body: "15+ hackathons in. Always up for a 36-hour build with a sharp team." },
+    { title: "Open to internships", body: "AI/ML, security engineering and full-stack roles, remote or on-site." },
+  ],
+
+  /* "What I'd build for you": proof = project ids that open their case files */
+  services: [
+    { title: "AI that survives the real world", body: "Models behind real APIs, calibrated and explainable: hybrid CNN + forensic-signal pipelines, edge inference with TF Lite, not just notebooks.", proof: ["veritas", "guardian"] },
+    { title: "Systems you can audit", body: "Security-first backends: AES-256-GCM at rest, TOTP MFA, rotating JWTs, RBAC/CBAC and hash-chained, tamper-evident logs.", proof: ["nyayavault", "cloud-anomaly"] },
+    { title: "Platforms people actually use", body: "Full-stack products from schema to deploy: role dashboards, lifecycles, notifications and mobile apps.", proof: ["startin", "playnear"] },
+  ],
+
+  /* ---------------------------------------------------------------------
+     THE DISTANCE: real stops on the way out from Earth.
+     km = approximate distance from Earth (used for the live distance readout).
+     Facts are real-world approximations; edit freely.
+     --------------------------------------------------------------------- */
+  stops: [
+    { id: "earth", name: "Earth", region: "HOME", km: 0, fact: "You are here: 20.6° N, 72.9° E, Valsad, India. Earth's radius is 6,371 km." },
+    { id: "moon", name: "The Moon", region: "EARTH–MOON SYSTEM", km: 384400, fact: "384,400 km away. Its light reaches us in 1.28 seconds; Apollo 11 took about 3 days." },
+    { id: "sun", name: "The Sun", region: "INNER SOLAR SYSTEM", km: 149.6e6, fact: "1 AU = 149.6 million km. The sunlight on your skin left the Sun 8 min 20 s ago." },
+    { id: "mars", name: "Mars", region: "INNER SOLAR SYSTEM", km: 225e6, fact: "On average ~225 million km away. A radio command takes 3 to 22 minutes to arrive." },
+    { id: "belt", name: "Asteroid Belt", region: "MAIN BELT", km: 4.2e8, fact: "Millions of rocks between Mars and Jupiter, yet mostly empty: probes cross it without dodging." },
+    { id: "jupiter", name: "Jupiter", region: "OUTER SOLAR SYSTEM", km: 7.0e8, fact: "11× Earth's width with 95+ known moons. Galileo found the four largest in 1610." },
+    { id: "io", name: "Io", region: "JUPITER SYSTEM", km: 7.01e8, fact: "The most volcanic world known: 400+ active volcanoes driven by Jupiter's tides." },
+    { id: "europa", name: "Europa", region: "JUPITER SYSTEM", km: 7.02e8, fact: "Hides a salty ocean under ~15–25 km of ice, with more water than all of Earth's oceans." },
+    { id: "ganymede", name: "Ganymede", region: "JUPITER SYSTEM", km: 7.03e8, fact: "The largest moon in the solar system, bigger than Mercury, with its own magnetic field." },
+    { id: "callisto", name: "Callisto", region: "JUPITER SYSTEM", km: 7.04e8, fact: "The most heavily cratered surface known: a 4-billion-year record of impacts." },
+    { id: "saturn", name: "Saturn", region: "OUTER SOLAR SYSTEM", km: 1.35e9, fact: "Its rings span ~280,000 km but are often only ~10 m to 1 km thick." },
+    { id: "voyager", name: "Voyager 1", region: "INTERSTELLAR SPACE", km: 2.5e10, fact: "~25 billion km away, the farthest human-made object. Launched 1977 carrying the Golden Record." },
+    { id: "oort", name: "Oort Cloud", region: "EDGE OF THE SUN'S REACH", km: 1.5e12, fact: "A shell of icy bodies from ~2,000 to 100,000 AU, the home of long-period comets." },
+    { id: "alphacen", name: "Alpha Centauri", region: "NEAREST STARS", km: 4.134e13, fact: "4.37 light-years, the nearest star system. At Voyager's speed: ~75,000 years." },
+    { id: "orion", name: "Orion Nebula", region: "ORION ARM", km: 1.2716e16, fact: "1,344 light-years. A stellar nursery you can see with the naked eye in Orion's sword." },
+    { id: "sgra", name: "Sagittarius A*", region: "GALACTIC CENTRE", km: 2.5232e17, fact: "26,670 light-years. A 4.3-million-solar-mass black hole, first imaged in 2022." },
+    { id: "andromeda", name: "Andromeda", region: "LOCAL GROUP", km: 2.4e19, fact: "2.5 million light-years. Approaching at ~110 km/s; the light you see left before humans existed." },
+    { id: "web", name: "The Cosmic Web", region: "OBSERVABLE UNIVERSE", km: 4.4e23, fact: "The observable universe is ~46.5 billion light-years in radius; galaxies trace dark-matter filaments." },
   ],
 
   education: [
@@ -340,9 +383,9 @@ window.PORTFOLIO = {
     {
       date: "2024 – 2026",
       type: "hackathon",
-      title: "15+ Hackathons · Winner",
-      body: "Competed in more than 15 college, inter-college and national hackathons, mostly as team lead of 2–5 member teams, and won.",
-      badge: "Winner",
+      title: "15+ Hackathons · 3 Wins",
+      body: "Competed in more than 15 college, inter-college and national hackathons, mostly as team lead of 2–5 member teams, and won 3 of them.",
+      badge: "3 Wins",
     },
     {
       date: "2025",
